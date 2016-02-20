@@ -1,0 +1,22 @@
+{
+  "name": "hyperscript-helpers-opts",
+  "main": "src/hyperscript-helpers-opts",
+  "version": "0.0.1",
+  "description": "no description",
+  "author": "Chris <chris@bumblehead.com>",
+  "license" : "MIT",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iambumblehead/hyperscript-helpers-opts.git"
+  },
+  "dependencies" : {
+    "virtual-dom" : "^2.1.1",
+    "hyperscript-helpers" : "^2.1.0"    
+  },
+  "keywords": [],
+  "scripts" : {
+    "start" : "node demo/start",
+    "test" : "node node_modules/jasmine-node/bin/jasmine-node --verbose test/"
+  }
+}
