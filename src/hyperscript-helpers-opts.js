@@ -1,5 +1,5 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.02.19-16:56:54 (last modified)
+// Timestamp: 2016.02.22-11:35:35 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 var hh = require('hyperscript-helpers');
@@ -27,14 +27,13 @@ var hyperscripthelpersopts = module.exports = (function (o) {
     'th', 'thead', 'title', 'tr', 'u', 'ul', 'video', 'progress'
   ];
 
-
-  // opts is first arg passed to function returned here
-  const node = h => () => {
+  // 'opts' anticipated as first arg passed to function
+  const node = h => function () {
     const args = [].slice.call(arguments, 0),
           classidopt = args[0],
           classidstr = args[1],
           newargs = args.slice(1);
-    
+
     newargs[0] = classidstr.replace(/:[^: .#]*/g, m => {
       return m = m.slice(1), m in classidopt ? classidopt[m] : m;
     });

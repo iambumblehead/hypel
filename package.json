@@ -11,8 +11,12 @@
     "url": "https://github.com/iambumblehead/hyperscript-helpers-opts.git"
   },
   "dependencies" : {
-    "virtual-dom" : "^2.1.1",
-    "hyperscript-helpers" : "^2.1.0"    
+    "hyperscript-helpers" : "^2.1.0"
+  },
+  "devdependencies" : {
+    "vdom-to-html" : "^2.2.0",
+    "virtual-dom" : "^2.1.1",    
+    "html" : "^0.0.10"
   },
   "keywords": [],
   "scripts" : {

@@ -1,15 +1,18 @@
 // Filename: start.js  
-// Timestamp: 2016.02.19-17:56:10 (last modified)
+// Timestamp: 2016.02.22-12:21:04 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>
 
-var h = require('virtual-dom/h'),
+var vdomtohtml = require('vdom-to-html'),
+    html = require('html'),
+    h = require('virtual-dom/h'),
     hh = require('../')(h);
 
 
 console.log('\n');
 
+// page data
 const pagedataarr = [{
-  uid : 'page/topnav',
+  uid : 'page-topnav',
   pagetype : 'nav',
   navitemarr : [
     'main', 'faq'
@@ -17,22 +20,22 @@ const pagedataarr = [{
   type : 'big',
   name : 'signin'
 }, {
-  uid : 'page/img1',
+  uid : 'page-img1',
   pagetype : 'img',  
   type : 'big',
-  name : 'fun image'
+  name : 'fun image 1'
 }, {
-  uid : 'page/img2',
+  uid : 'page-img2',
   pagetype : 'img',  
   type : 'big',
-  name : 'fun image'
+  name : 'fun image 2'
 }, {
-  uid : 'page/img3',
+  uid : 'page-img3',
   pagetype : 'img',  
-  type : 'big',
-  name : 'fun image'  
+  type : 'small',
+  name : 'fun image 3'  
 }, {
-  uid : 'page/bottomnav',
+  uid : 'page-bottomnav',
   pagetype : 'nav',
   type : 'small',
   name : 'general',
@@ -41,24 +44,16 @@ const pagedataarr = [{
   ]
 }];
 
+// static page objects
 const getpage = () => ({
-  getcontentelem$ : function () {
-    
-  },
-  getcontentelem : function () {
-    
-  },  
-  getvnode : function () {
-
-  }
+  getcontainerelem : opt => document.getElementById(opt.uid)
 });
 
 const getpageimg = () => {
   var p = getpage();
 
-  p.getvnode = function () {
-
-  };
+  p.getvnode = opt =>
+    hh.imgo(opt, '#:uid.img .:type');
 
   return p;
 };
@@ -66,55 +61,58 @@ const getpageimg = () => {
 const getpagenav = () => {
   var p = getpage();
 
-  p.getvnode = function (opt) {
-    return hh.navo(opt, '#nav-:uid.nav', [
-      hh.ulo(opt, '.nav-list', [
-        hh.lio(opt, '.nav-list-item', [
-          
-        ])
+  p.getvnode = opt =>
+    hh.navo(opt, '#:uid.nav', [
+      hh.ul(opt, '.nav-list', [
+        opt.navitemarr && opt.navitemarr
+          .map(navitem => hh.lio(opt, '.nav-list-item .:type', navitem))
       ])
     ]);
-  };
 
   return p;
 };
 
+// stored reference of static page objects
 const page = {
   img : getpageimg(),
   nav : getpagenav()
 };
 
-// render nodes...
-
-const getrenderedvnode = function (pagedataarr) {
-  return hh.div(pagedataarr.map(function (data) {
-    return pagenodes[data.pagetype].getvnode(data);
-  }));
-};
 
 
-
-
-hh.div(pagedataarr.map(function (data) {
-  return pagenodes[data.pagetyp].getvnode(data);
+// build page objects
+const div = hh.div(pagedataarr.map(function (data) {
+  return page[data.pagetype].getvnode(data);
 }));
 
 
+console.log(
+  html.prettyPrint(vdomtohtml(div))
+);
 
-// get nodes...
+//<div>
+//    <nav id="page-topnav" class="nav">
+//        <ul class="nav-list">
+//            <li class="nav-list-item big">main</li>
+//            <li class="nav-list-item big">faq</li>
+//        </ul>
+//    </nav>
+//    <img id="page-img1" class="img big">
+//    <img id="page-img2" class="img big">
+//    <img id="page-img3" class="img small">
+//    <nav id="page-bottomnav" class="nav">
+//        <ul class="nav-list">
+//            <li class="nav-list-item small">phone</li>
+//            <li class="nav-list-item small">contact</li>
+//        </ul>
+//    </nav>
+//</div>
 
-
-
-/*
-  hh.divo({
-    uid : 'foouid',
-    type : 'big',
-    name : 'bluestyle'
-  }, '#button-:uid.button button-:type.:name');
-*/
-
-
-
-
-
+if (typeof document === 'object') {
+  document.body.appendChild(vdomtohtml(div));
+  var navdata = pagedataarr[0];
+  page[navdata.type].getcontainerelem();
+  // <nav id="page" class="nav"> ... </nav>
+}
+  
 console.log('\n');
