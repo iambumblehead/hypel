@@ -2,7 +2,7 @@ hyperscript-helpers-opts
 ========================
 **(c)[Bumblehead][0] 2016**
 
-Easily define className and id attributes dynamically.
+Define hyperscript className and id attributes dynamically.
 
 ```javascript
 h = require('virtual-dom/h');

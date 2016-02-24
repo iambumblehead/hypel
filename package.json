@@ -1,8 +1,8 @@
 {
   "name": "hyperscript-helpers-opts",
   "main": "dist/hyperscript-helpers-opts",
-  "version": "0.0.1",
-  "description": "no description",
+  "version": "0.0.2",
+  "description": "Define hyperscript className and id attributes dynamically.",
   "author": "Chris <chris@bumblehead.com>",
   "license" : "MIT",
   "readmeFilename": "README.md",
