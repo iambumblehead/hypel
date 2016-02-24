@@ -1,18 +1,11 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.02.22-11:35:35 (last modified)
+// Timestamp: 2016.02.23-16:49:34 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 var hh = require('hyperscript-helpers');
 
 var hyperscripthelpersopts = module.exports = (function (o) {
   
-  // 1. convenient uid for getting node reference or type for styling
-  //
-  //    span('#button-:uid.button.button-:type', opts)
-  //
-  // 2. make it easy add localname for recomposoble vdom constructions
-  //
-  //    div('.nav.:lname', opts)
   const TAG_NAMES = [
     'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base',
     'bdi', 'bdo', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption',
@@ -41,11 +34,9 @@ var hyperscripthelpersopts = module.exports = (function (o) {
     return h.apply(h, newargs);
   };
   
-  return h => {
-    return TAG_NAMES.reduce((prev, cur) => {
-      return prev[cur + 'o'] = node(prev[cur]), prev;
-    }, hh(h));
-  };
+  return h => TAG_NAMES.reduce((prev, cur) => {
+    return prev[cur + 'o'] = node(prev[cur]), prev;
+  }, hh(h));
   
   return o;
   
