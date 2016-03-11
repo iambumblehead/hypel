@@ -1,5 +1,5 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.02.23-16:49:34 (last modified)
+// Timestamp: 2016.03.11-00:22:33 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 var hh = require('hyperscript-helpers');
@@ -20,24 +20,25 @@ var hyperscripthelpersopts = module.exports = (function (o) {
     'th', 'thead', 'title', 'tr', 'u', 'ul', 'video', 'progress'
   ];
 
-  // 'opts' anticipated as first arg passed to function
-  const node = h => function () {
-    const args = [].slice.call(arguments, 0),
-          classidopt = args[0],
-          classidstr = args[1],
-          newargs = args.slice(1);
+  const getoptsclassidstr = (opts, classidstr) => (
+    classidstr.replace(/:[^: -.#]*/g, m => {
+      m = m.slice(1);
+      m = opts[m] || m;
+      return m;
+    })
+  );
 
-    newargs[0] = classidstr.replace(/:[^: .#]*/g, m => {
-      return m = m.slice(1), m in classidopt ? classidopt[m] : m;
-    });
-    
-    return h.apply(h, newargs);
-  };
-  
-  return h => TAG_NAMES.reduce((prev, cur) => {
-    return prev[cur + 'o'] = node(prev[cur]), prev;
-  }, hh(h));
-  
-  return o;
+  return (h) => (
+    TAG_NAMES.reduce((hhh, cur) => {
+      hhh[cur + 'o'] = function () {
+        var args = [].slice.call(arguments, 0),
+            newargs = args.slice(2);
+
+        newargs.splice(0, 0, getoptsclassidstr(args[0], args[1]));
+        return hhh[cur].apply(hhh, newargs);        
+      };
+      return hhh;
+    }, hh(h))
+  );
   
 }());
