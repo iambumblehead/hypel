@@ -1,5 +1,5 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.03.14-13:11:22 (last modified)
+// Timestamp: 2016.03.14-14:07:38 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 var hh = require('hyperscript-helpers');
@@ -24,8 +24,8 @@ var hyperscripthelpersopts = module.exports = (function (o) {
   // div.properties.className; // hello
   // div.properties.id;        // hello
   
-  const encodeid = idstr => idstr.replace(/\//, ':');
-  const decodeid = idstr => idstr.replace(/\:/, '/');
+  const encodeid = idstr => idstr.replace(/\//g, ':');
+  const decodeid = idstr => idstr.replace(/\:/g, '/');
   
   const getoptsclassidstr = (opts, classidstr) => (
     encodeid(classidstr.replace(/:[^: -.#]*/g, m => {
