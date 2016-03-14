@@ -47,7 +47,7 @@ module.exports = exports['default'];
 
 },{}],2:[function(require,module,exports){
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.03.13-20:53:19 (last modified)
+// Timestamp: 2016.03.14-13:11:22 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 var hh = require('hyperscript-helpers');
@@ -68,12 +68,19 @@ var hyperscripthelpersopts = module.exports = (function (o) {
     'th', 'thead', 'title', 'tr', 'u', 'ul', 'video', 'progress'
   ];
 
+  // var div = h('div.hello/world#hello/world');
+  // div.properties.className; // hello
+  // div.properties.id;        // hello
+  
+  const encodeid = idstr => idstr.replace(/\//, ':');
+  const decodeid = idstr => idstr.replace(/\:/, '/');
+  
   const getoptsclassidstr = (opts, classidstr) => (
-    classidstr.replace(/:[^: -.#]*/g, m => {
+    encodeid(classidstr.replace(/:[^: -.#]*/g, m => {
       m = m.slice(1);
       m = opts[m] || m;
       return m;
-    })
+    }))
   );
 
   const buildoptfns = (h) => {
@@ -107,28 +114,15 @@ var hyperscripthelpersopts = module.exports = (function (o) {
       }, {});
     };
 
+    hhopts.encodeid = encodeid;
+    hhopts.decodeid = decodeid;
+
     return TAG_NAMES.reduce((hhoptsfn, tagname) => {
       hhoptsfn[tagname] = namespace[tagname];
       
       return hhoptsfn;
     }, hhopts);
   };
-
-//  var o = {};
-/*
-  return (h) => (
-    TAG_NAMES.reduce((hhh, cur) => {
-      hhh[cur + 'o'] = function () {
-        var args = [].slice.call(arguments, 0),
-            newargs = args.slice(2);
-
-        newargs.splice(0, 0, getoptsclassidstr(args[0], args[1]));
-        return hhh[cur].apply(hhh, newargs);        
-      };
-      return hhh;
-    }, hh(h))
-  );
-*/
   
 }());
 

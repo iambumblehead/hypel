@@ -1,5 +1,5 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.03.13-20:54:02 (last modified)
+// Timestamp: 2016.03.14-13:11:22 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 var hh = require('hyperscript-helpers');
@@ -20,12 +20,19 @@ var hyperscripthelpersopts = module.exports = (function (o) {
     'th', 'thead', 'title', 'tr', 'u', 'ul', 'video', 'progress'
   ];
 
+  // var div = h('div.hello/world#hello/world');
+  // div.properties.className; // hello
+  // div.properties.id;        // hello
+  
+  const encodeid = idstr => idstr.replace(/\//, ':');
+  const decodeid = idstr => idstr.replace(/\:/, '/');
+  
   const getoptsclassidstr = (opts, classidstr) => (
-    classidstr.replace(/:[^: -.#]*/g, m => {
+    encodeid(classidstr.replace(/:[^: -.#]*/g, m => {
       m = m.slice(1);
       m = opts[m] || m;
       return m;
-    })
+    }))
   );
 
   const buildoptfns = (h) => {
@@ -58,6 +65,9 @@ var hyperscripthelpersopts = module.exports = (function (o) {
         return hhopts;
       }, {});
     };
+
+    hhopts.encodeid = encodeid;
+    hhopts.decodeid = decodeid;
 
     return TAG_NAMES.reduce((hhoptsfn, tagname) => {
       hhoptsfn[tagname] = namespace[tagname];
