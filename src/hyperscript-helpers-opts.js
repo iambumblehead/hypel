@@ -1,5 +1,5 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.03.11-00:22:33 (last modified)
+// Timestamp: 2016.03.13-20:54:02 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 var hh = require('hyperscript-helpers');
@@ -28,17 +28,42 @@ var hyperscripthelpersopts = module.exports = (function (o) {
     })
   );
 
-  return (h) => (
-    TAG_NAMES.reduce((hhh, cur) => {
-      hhh[cur + 'o'] = function () {
+  const buildoptfns = (h) => {
+    var helperfns = hh(h);
+    
+    return TAG_NAMES.reduce((hhh, cur) => {
+      hhh[cur] = function () {
         var args = [].slice.call(arguments, 0),
-            newargs = args.slice(2);
+            newargs = args;
 
-        newargs.splice(0, 0, getoptsclassidstr(args[0], args[1]));
-        return hhh[cur].apply(hhh, newargs);        
+        if (typeof args[1] === 'string') {
+          newargs = args.slice(2);
+          newargs.splice(0, 0, getoptsclassidstr(args[0], args[1]));          
+        }
+        
+        return helperfns[cur].apply(0, newargs);
       };
       return hhh;
-    }, hh(h))
-  );
+    }, {});
+  };
+
+  return (h) => {
+    var namespace = buildoptfns(h);
+
+    var hhopts = (opts) => {
+      return TAG_NAMES.reduce((hhopts, cur) => {
+        hhopts[cur] = function () {
+          return namespace[cur](opts, ...arguments);
+        };
+        return hhopts;
+      }, {});
+    };
+
+    return TAG_NAMES.reduce((hhoptsfn, tagname) => {
+      hhoptsfn[tagname] = namespace[tagname];
+      
+      return hhoptsfn;
+    }, hhopts);
+  };
   
 }());

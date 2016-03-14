@@ -6,18 +6,16 @@ Define hyperscript className and id attributes dynamically.
 
 ```javascript
 h = require('virtual-dom/h');
-hho = require('hyperscript-helpers-opts')(h);
+hho = require('hyperscript-helpers-opts')(h)({
+  uid : 'page-img',
+  type : 'big'
+});
   
-opt = { uid : 'page-img', type : 'big' };
-hho.imgo(pageopt, '#:uid.img.:type');
+hho.img('#:uid.img.:type');
 // <img id="page-img" class="img big">
 ```
 
-Original hyperscript-helpers functions are defined along with new functions
-affixed with 'o' that use object and string as first and second parameters.
-
-This is helpful for reusing and recomposing page object functions, for which
-each object requires unique id and className attributes only.
+hyperscript-helpers functions are defined with an object that is used to populate dynamic regions of the className and id string..
 
 
 [0]: http://www.bumblehead.com                            "bumblehead"
