@@ -1,5 +1,5 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.03.14-14:07:38 (last modified)
+// Timestamp: 2016.05.12-14:44:33 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 var hh = require('hyperscript-helpers');
@@ -47,7 +47,6 @@ var hyperscripthelpersopts = module.exports = (function (o) {
           newargs = args.slice(2);
           newargs.splice(0, 0, getoptsclassidstr(args[0], args[1]));          
         }
-        
         return helperfns[cur].apply(0, newargs);
       };
       return hhh;
