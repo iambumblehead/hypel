@@ -1,11 +1,13 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.05.12-14:44:33 (last modified)
+// Timestamp: 2016.06.28-16:19:52 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 var hh = require('hyperscript-helpers');
+    //htmltagnames = require('html-tag-names');
 
 var hyperscripthelpersopts = module.exports = (function (o) {
   
+  //const TAG_NAMES = htmltagnames.tagNames;
   const TAG_NAMES = [
     'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base',
     'bdi', 'bdo', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption',
@@ -19,7 +21,7 @@ var hyperscripthelpersopts = module.exports = (function (o) {
     'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot',
     'th', 'thead', 'title', 'tr', 'u', 'ul', 'video', 'progress'
   ];
-
+    
   // var div = h('div.hello/world#hello/world');
   // div.properties.className; // hello
   // div.properties.id;        // hello
@@ -30,7 +32,7 @@ var hyperscripthelpersopts = module.exports = (function (o) {
   const getoptsclassidstr = (opts, classidstr) => (
     encodeid(classidstr.replace(/:[^: -.#]*/g, m => {
       m = m.slice(1);
-      m = opts[m] || m;
+      m = m in opts ? String(opts[m]) : m;
       return m;
     }))
   );
