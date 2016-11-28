@@ -1,5 +1,5 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.11.27-20:54:16 (last modified)
+// Timestamp: 2016.11.27-23:08:53 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 let hh = require('hyperscript-helpers'),
@@ -7,7 +7,6 @@ let hh = require('hyperscript-helpers'),
 
 let hyperscripthelpersopts = module.exports = (o => {
   
-  //const TAG_NAMES = htmltagnames.tagNames;
   const TAG_NAMES = [
     'a', 'abbr', 'acronym', 'address', 'applet', 'area', 'article', 'aside', 'audio', 'b',
     'base', 'basefont', 'bdi', 'bdo', 'bgsound', 'big', 'blink', 'blockquote', 'body',
@@ -64,24 +63,26 @@ let hyperscripthelpersopts = module.exports = (o => {
 
     return tagnamearr.reduce((hhh, cur) => {
       hhh[cur] = function () {
-        var args = [].slice.call(arguments, 0),
-            newargs = args;
+        let args = [].slice.call(arguments, 0),
+            newargs;
 
         if (typeof args[1] === 'string') {
           newargs = args.slice(2);
-          newargs.splice(0, 0, getoptsclassidstr(args[0], args[1]));          
+          newargs.splice(0, 0, getoptsclassidstr(args[0], args[1]));
+        } else {
+          newargs = args.slice(1);
         }
+
         return helperfns[cur].apply(0, newargs);
       };
       return hhh;
     }, {});
   };
 
-
   const buildhelper = (helpers, tagnamearr) => ((h) => {
     let namespace = buildoptfns(h, helpers, tagnamearr);
 
-    let hhopts = (opts) => 
+    let hhopts = opts => 
       tagnamearr.reduce((hhopts, cur) => (
         hhopts[cur] = function () {
           return namespace[cur](opts, ...arguments);
