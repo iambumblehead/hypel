@@ -1,26 +1,48 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.06.28-16:19:52 (last modified)
+// Timestamp: 2016.11.27-20:54:16 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
-var hh = require('hyperscript-helpers');
-    //htmltagnames = require('html-tag-names');
+let hh = require('hyperscript-helpers'),
+    hhsvg = require('hyperscript-helpers/dist/svg');
 
-var hyperscripthelpersopts = module.exports = (function (o) {
+let hyperscripthelpersopts = module.exports = (o => {
   
   //const TAG_NAMES = htmltagnames.tagNames;
   const TAG_NAMES = [
-    'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base',
-    'bdi', 'bdo', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption',
-    'cite', 'code', 'col', 'colgroup', 'dd', 'del', 'dfn', 'dir', 'div', 'dl',
-    'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form',
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'hgroup', 'hr', 'html',
-    'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend',
-    'li', 'link', 'main', 'map', 'mark', 'menu', 'meta', 'nav', 'noscript',
-    'object', 'ol', 'optgroup', 'option', 'p', 'param', 'pre', 'q', 'rp', 'rt',
-    'ruby', 's', 'samp', 'script', 'section', 'select', 'small', 'source', 'span',
-    'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot',
-    'th', 'thead', 'title', 'tr', 'u', 'ul', 'video', 'progress'
+    'a', 'abbr', 'acronym', 'address', 'applet', 'area', 'article', 'aside', 'audio', 'b',
+    'base', 'basefont', 'bdi', 'bdo', 'bgsound', 'big', 'blink', 'blockquote', 'body',
+    'br', 'button', 'canvas', 'caption', 'center', 'cite', 'code', 'col', 'colgroup',
+    'command', 'content', 'data', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog',
+    'dir', 'div', 'dl', 'dt', 'element', 'em', 'embed', 'fieldset', 'figcaption', 'figure',
+    'font', 'footer', 'form', 'frame', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'head', 'header', 'hgroup', 'hr', 'html', 'i', 'iframe', 'image', 'img', 'input',
+    'ins', 'isindex', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'listing', 'main',
+    'map', 'mark', 'marquee', 'math', 'menu', 'menuitem', 'meta', 'meter', 'multicol',
+    'nav', 'nextid', 'nobr', 'noembed', 'noframes', 'noscript', 'object', 'ol', 'optgroup',
+    'option', 'output', 'p', 'param', 'picture', 'plaintext', 'pre', 'progress', 'q', 'rb',
+    'rbc', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp', 'script', 'section', 'select', 'shadow',
+    'small', 'source', 'spacer', 'span', 'strike', 'strong', 'style', 'sub', 'summary',
+    'sup', 'svg', 'table', 'tbody', 'td', 'template', 'textarea', 'tfoot', 'th', 'thead',
+    'time', 'title', 'tr', 'track', 'tt', 'u', 'ul', 'var', 'video', 'wbr', 'xmp'
   ];
+
+  const TAG_NAMES_SVG = [
+    'a', 'altGlyph', 'altGlyphDef', 'altGlyphItem', 'animate', 'animateColor',
+    'animateMotion', 'animateTransform', 'circle', 'clipPath', 'colorProfile',
+    'cursor', 'defs', 'desc', 'ellipse', 'feBlend', 'feColorMatrix',
+    'feComponentTransfer', 'feComposite', 'feConvolveMatrix', 'feDiffuseLighting',
+    'feDisplacementMap', 'feDistantLight', 'feFlood', 'feFuncA', 'feFuncB',
+    'feFuncG', 'feFuncR', 'feGaussianBlur', 'feImage', 'feMerge', 'feMergeNode',
+    'feMorphology', 'feOffset', 'fePointLight', 'feSpecularLighting',
+    'feSpotlight', 'feTile', 'feTurbulence', 'filter', 'font', 'fontFace',
+    'fontFaceFormat', 'fontFaceName', 'fontFaceSrc', 'fontFaceUri',
+    'foreignObject', 'g', 'glyph', 'glyphRef', 'hkern', 'image', 'line',
+    'linearGradient', 'marker', 'mask', 'metadata', 'missingGlyph', 'mpath',
+    'path', 'pattern', 'polygon', 'polyline', 'radialGradient', 'rect', 'script',
+    'set', 'stop', 'style', 'switch', 'symbol', 'text', 'textPath', 'title',
+    'tref', 'tspan', 'use', 'view', 'vkern'
+  ];
+
     
   // var div = h('div.hello/world#hello/world');
   // div.properties.className; // hello
@@ -37,10 +59,10 @@ var hyperscripthelpersopts = module.exports = (function (o) {
     }))
   );
 
-  const buildoptfns = (h) => {
-    var helperfns = hh(h);
-    
-    return TAG_NAMES.reduce((hhh, cur) => {
+  const buildoptfns = (h, helpers, tagnamearr) => {
+    let helperfns = helpers(h);
+
+    return tagnamearr.reduce((hhh, cur) => {
       hhh[cur] = function () {
         var args = [].slice.call(arguments, 0),
             newargs = args;
@@ -55,26 +77,30 @@ var hyperscripthelpersopts = module.exports = (function (o) {
     }, {});
   };
 
-  return (h) => {
-    var namespace = buildoptfns(h);
 
-    var hhopts = (opts) => {
-      return TAG_NAMES.reduce((hhopts, cur) => {
+  const buildhelper = (helpers, tagnamearr) => ((h) => {
+    let namespace = buildoptfns(h, helpers, tagnamearr);
+
+    let hhopts = (opts) => 
+      tagnamearr.reduce((hhopts, cur) => (
         hhopts[cur] = function () {
           return namespace[cur](opts, ...arguments);
-        };
-        return hhopts;
-      }, {});
-    };
+        },
+        hhopts
+      ), {});
 
     hhopts.encodeid = encodeid;
     hhopts.decodeid = decodeid;
 
-    return TAG_NAMES.reduce((hhoptsfn, tagname) => {
-      hhoptsfn[tagname] = namespace[tagname];
-      
-      return hhoptsfn;
-    }, hhopts);
-  };
+    return tagnamearr.reduce((hhoptsfn, tagname) => (
+      hhoptsfn[tagname] = namespace[tagname],
+      hhoptsfn
+    ), hhopts);
+  });
+
+  o = buildhelper(hh, TAG_NAMES);
+  o.svg = buildhelper(hhsvg, TAG_NAMES_SVG);
+
+  return o;
   
-}());
+})();
