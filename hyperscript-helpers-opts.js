@@ -1,5 +1,5 @@
 // Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2016.11.27-23:49:47 (last modified)
+// Timestamp: 2017.05.24-19:19:38 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
 let hh = require('hyperscript-helpers'),

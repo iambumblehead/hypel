@@ -1,7 +1,7 @@
 {
   "name": "hyperscript-helpers-opts",
-  "main": "src/hyperscript-helpers-opts",
-  "version": "0.1.7",
+  "main": "hyperscript-helpers-opts",
+  "version": "0.2.0",
   "description": "Define hyperscript className and id attributes dynamically.",
   "author": "Chris <chris@bumblehead.com>",
   "license" : "MIT",
@@ -12,8 +12,7 @@
   },
   "dependencies" : {
     "html-tag-names": "^1.0.0",
-    "hyperscript-helpers" : "^2.1.0",
-    "hyperscript-helpers" : "^3.0.2"
+    "hyperscript-helpers" : "^3.0.3"
   },
   "devDependencies" : {
     "vdom-to-html" : "^2.2.0",
