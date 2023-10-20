@@ -5,6 +5,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
+import { JSDOM } from 'jsdom'
+
 import vdomtohtml from 'vdom-to-html'
 import html from 'html'
 import h from 'virtual-dom/h.js'
@@ -14,41 +16,38 @@ const hh = hho(h);
 
 // page data
 const pagedataarr = [{
-  uid : 'page-topnav',
-  pagetype : 'nav',
-  navitemarr : [
-    'main', 'faq'
-  ],
-  type : 'big',
-  name : 'signin'
+  uid: 'page-topnav',
+  pagetype: 'nav',
+  navitemarr: ['main', 'faq'],
+  type: 'big',
+  name: 'signin'
 }, {
-  uid : 'page-img1',
-  pagetype : 'img',  
-  type : 'big',
-  name : 'fun image 1'
+  uid: 'page-img1',
+  pagetype: 'img',  
+  type: 'big',
+  name: 'fun image 1'
 }, {
-  uid : 'page-img2',
-  pagetype : 'img',  
-  type : 'big',
-  name : 'fun image 2'
+  uid: 'page-img2',
+  pagetype: 'img',  
+  type: 'big',
+  name: 'fun image 2'
 }, {
-  uid : 'page-img3',
-  pagetype : 'img',  
-  type : 'small',
-  name : 'fun image 3'  
+  uid: 'page-img3',
+  pagetype: 'img',  
+  type: 'small',
+  name: 'fun image 3'  
 }, {
-  uid : 'page-bottomnav',
-  pagetype : 'nav',
-  type : 'small',
-  name : 'general',
-  navitemarr : [
-    'phone', 'contact'
-  ]
+  uid: 'page-bottomnav',
+  pagetype: 'nav',
+  type: 'small',
+  name: 'general',
+  navitemarr: ['phone', 'contact']
 }];
 
 // static page objects
 const getpage = () => ({
-  getcontainerelem : opt => document.getElementById(opt.uid)
+  getcontainerelem: (opt, win) => (
+    win.document.getElementById(opt.uid))
 });
 
 const getpageimg = () => {
@@ -63,21 +62,21 @@ const getpageimg = () => {
 const getpagenav = () => {
   var p = getpage();
 
-  p.getvnode = opt =>
+  p.getvnode = opt => (
     hh.nav(opt, '#:uid.nav', [
       hh.ul(opt, '.nav-list', [
         opt.navitemarr && opt.navitemarr
           .map(navitem => hh.li(opt, '.nav-list-item .:type', navitem))
       ])
-    ]);
+    ]));
 
   return p;
 };
 
 // stored reference of static page objects
 const page = {
-  img : getpageimg(),
-  nav : getpagenav()
+  img: getpageimg(),
+  nav: getpagenav()
 };
 
 // build page objects
@@ -108,13 +107,13 @@ test('should generate stringy dom', () => {
   assert.strictEqual(html.prettyPrint(vdomtohtml(div)), stringydom)
 })
 
-/*
-if (typeof document === 'object') {
-  document.body.appendChild(vdomtohtml(div));
-  var navdata = pagedataarr[0];
-  page[navdata.type].getcontainerelem();
-  // <nav id="page" class="nav"> ... </nav>
-}
-  
-console.log('\n');
-*/
+test('should be compatible with browser dom', () => {
+  const dom = new JSDOM(`<!DOCTYPE html><body></body>`)
+
+  dom.window.document.body.innerHTML = vdomtohtml(div)
+
+  const navdata = pagedataarr[0]
+  const elem = page[navdata.pagetype].getcontainerelem(navdata, dom.window)
+
+  assert.ok(elem instanceof dom.window.Element)
+})
