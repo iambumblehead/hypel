@@ -2,11 +2,12 @@
 // Timestamp: 2016.02.22-12:21:04 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>
 
-var vdomtohtml = require('vdom-to-html'),
-    html = require('html'),
-    h = require('virtual-dom/h'),
-    hh = require('../')(h);
+import vdomtohtml from 'vdom-to-html'
+import html from 'html'
+import h from 'virtual-dom/h.js'
+import hho from '../hyperscript-helpers-opts.js'
 
+const hh = hho(h);
 
 console.log('\n');
 
@@ -53,7 +54,7 @@ const getpageimg = () => {
   var p = getpage();
 
   p.getvnode = opt =>
-    hh.imgo(opt, '#:uid.img .:type');
+    hh.img(opt, '#:uid.img .:type');
 
   return p;
 };
@@ -62,10 +63,10 @@ const getpagenav = () => {
   var p = getpage();
 
   p.getvnode = opt =>
-    hh.navo(opt, '#:uid.nav', [
+    hh.nav(opt, '#:uid.nav', [
       hh.ul(opt, '.nav-list', [
         opt.navitemarr && opt.navitemarr
-          .map(navitem => hh.lio(opt, '.nav-list-item .:type', navitem))
+          .map(navitem => hh.li(opt, '.nav-list-item .:type', navitem))
       ])
     ]);
 
@@ -81,13 +82,16 @@ const page = {
 
 
 // build page objects
-const div = hh.div(pagedataarr.map(function (data) {
+console.log('blick', hh.div.toString())
+const div = hh.div({}, pagedataarr.map(data => {
+  console.log('called', page[data.pagetype].getvnode(data))
   return page[data.pagetype].getvnode(data);
 }));
 
+console.log({ div })
 
 console.log(
-  html.prettyPrint(vdomtohtml(div))
+  'result', html.prettyPrint(vdomtohtml(div))
 );
 
 //<div>

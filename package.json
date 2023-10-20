@@ -1,14 +1,21 @@
 {
   "name": "hyperscript-helpers-opts",
-  "main": "hyperscript-helpers-opts",
-  "version": "0.2.0",
+  "main": "hyperscript-helpers-opts.js",
+  "type": "module",
+  "exports": {
+    "import": "./hyperscript-helpers-opts.js"
+  },
+  "files": [
+    "./hyperscript-helpers-opts.js"
+  ],
+  "version": "0.2.1",
   "description": "Define hyperscript className and id attributes dynamically.",
   "author": "Chris <chris@bumblehead.com>",
   "license" : "MIT",
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/iambumblehead/hyperscript-helpers-opts.git"
+    "url": "git+https://github.com/iambumblehead/hyperscript-helpers-opts.git"
   },
   "dependencies" : {
     "html-tag-names": "^1.0.0",
@@ -17,7 +24,6 @@
   "devDependencies" : {
     "vdom-to-html" : "^2.2.0",
     "virtual-dom" : "^2.1.1",
-    "browserify": "12.0.1",
     "html" : "^0.0.10"
   },
   "keywords": [
@@ -26,8 +32,7 @@
     "dynamic class"
   ],
   "scripts" : {
-    "browserify" : "browserify src/hyperscript-helpers-opts.js -s hyperscripthelpersopts > dist/hyperscript-helpers-opts.js",
-    "start" : "node demo/start",
-    "test" : "node demo/start"
+    "start" : "node demo/start.js",
+    "test" : "node demo/start.js"
   }
 }
