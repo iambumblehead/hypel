@@ -32,7 +32,6 @@
     "dynamic class"
   ],
   "scripts" : {
-    "start" : "node demo/start.js",
-    "test" : "node demo/start.js"
+    "test" : "node --test ./*test.js"
   }
 }

@@ -2,14 +2,15 @@
 // Timestamp: 2016.02.22-12:21:04 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>
 
+import test from 'node:test'
+import assert from 'node:assert/strict'
+
 import vdomtohtml from 'vdom-to-html'
 import html from 'html'
 import h from 'virtual-dom/h.js'
-import hho from '../hyperscript-helpers-opts.js'
+import hho from './hyperscript-helpers-opts.js'
 
 const hh = hho(h);
-
-console.log('\n');
 
 // page data
 const pagedataarr = [{
@@ -79,39 +80,35 @@ const page = {
   nav : getpagenav()
 };
 
-
-
 // build page objects
-console.log('blick', hh.div.toString())
 const div = hh.div({}, pagedataarr.map(data => {
-  console.log('called', page[data.pagetype].getvnode(data))
   return page[data.pagetype].getvnode(data);
 }));
 
-console.log({ div })
+const stringydom = html.prettyPrint(`
+  <div>
+    <nav id="page-topnav" class="nav">
+      <ul class="nav-list">
+        <li class="nav-list-item big">main</li>
+        <li class="nav-list-item big">faq</li>
+      </ul>
+    </nav>
+    <img id="page-img1" class="img big">
+    <img id="page-img2" class="img big">
+    <img id="page-img3" class="img small">
+    <nav id="page-bottomnav" class="nav">
+      <ul class="nav-list">
+        <li class="nav-list-item small">phone</li>
+        <li class="nav-list-item small">contact</li>
+      </ul>
+    </nav>
+  </div>`)
 
-console.log(
-  'result', html.prettyPrint(vdomtohtml(div))
-);
+test('should generate stringy dom', () => {
+  assert.strictEqual(html.prettyPrint(vdomtohtml(div)), stringydom)
+})
 
-//<div>
-//    <nav id="page-topnav" class="nav">
-//        <ul class="nav-list">
-//            <li class="nav-list-item big">main</li>
-//            <li class="nav-list-item big">faq</li>
-//        </ul>
-//    </nav>
-//    <img id="page-img1" class="img big">
-//    <img id="page-img2" class="img big">
-//    <img id="page-img3" class="img small">
-//    <nav id="page-bottomnav" class="nav">
-//        <ul class="nav-list">
-//            <li class="nav-list-item small">phone</li>
-//            <li class="nav-list-item small">contact</li>
-//        </ul>
-//    </nav>
-//</div>
-
+/*
 if (typeof document === 'object') {
   document.body.appendChild(vdomtohtml(div));
   var navdata = pagedataarr[0];
@@ -120,3 +117,4 @@ if (typeof document === 'object') {
 }
   
 console.log('\n');
+*/
