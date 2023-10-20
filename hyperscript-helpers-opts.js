@@ -2,71 +2,60 @@
 // Timestamp: 2017.05.24-19:19:38 (last modified)
 // Author(s): bumblehead <chris@bumblehead.com>  
 
-let hh = require('hyperscript-helpers'),
-    hhsvg = require('hyperscript-helpers/dist/svg');
+import hh from 'hyperscript-helpers'
+import hhsvg from 'hyperscript-helpers/dist/svg.js'
 
-let hyperscripthelpersopts = module.exports = (o => {
-  // var div = h('div.hello/world#hello/world');
-  // div.properties.className; // hello
-  // div.properties.id;        // hello
+// var div = h('div.hello/world#hello/world');
+// div.properties.className; // hello
+// div.properties.id;        // hello
+
+const encodeid = idstr => idstr.replace(/\//g, ':');
+
+const decodeid = idstr => idstr.replace(/\:/g, '/');
+
+const getoptsclassidstr = (opts, classidstr) => (
+  encodeid(classidstr.replace(/:[^: -.#]*/g, m => (
+    m = m.slice(1),
+    m = m in opts ? String(opts[m]) : m,
+    m
+  )))
+);
+
+const buildoptfns = helperfns => helperfns.TAG_NAMES.reduce((hhh, cur) => {
+  hhh[cur] = (...args) => {
+    let newargs;
+
+    if (typeof args[1] === 'string') {
+      newargs = args.slice(2);
+      newargs.splice(0, 0, getoptsclassidstr(args[0], args[1]));
+    } else {
+      newargs = args.slice(1);
+    }
+
+    return helperfns[cur](...newargs)
+  };
   
-  const encodeid = idstr =>
-          idstr.replace(/\//g, ':');
-  
-  const decodeid = idstr =>
-          idstr.replace(/\:/g, '/');
-  
-  const getoptsclassidstr = (opts, classidstr) => (
-    encodeid(classidstr.replace(/:[^: -.#]*/g, m => {
-      m = m.slice(1);
-      m = m in opts ? String(opts[m]) : m;
-      return m;
-    }))
-  );
+  return hhh;
+}, {});
 
-  const buildoptfns = (helperfns) => 
-    helperfns.TAG_NAMES.reduce((hhh, cur) => {
-      hhh[cur] = function () {
-        let args = [].slice.call(arguments, 0),
-            newargs;
+const buildhelper = helpers => h => {
+  let helperobj = helpers(h),
+      namespace = buildoptfns(helperobj);
 
-        if (typeof args[1] === 'string') {
-          newargs = args.slice(2);
-          newargs.splice(0, 0, getoptsclassidstr(args[0], args[1]));
-        } else {
-          newargs = args.slice(1);
-        }
+  let hhopts = opts => helperobj.TAG_NAMES.reduce((hhopts, cur) => (
+    hhopts[cur] = (...args) => namespace[cur](opts, ...args),
+    hhopts
+  ), {});
 
-        return helperfns[cur].apply(0, newargs);
-      };
-      
-      return hhh;
-    }, {});
+  hhopts.encodeid = encodeid;
+  hhopts.decodeid = decodeid;
 
-  const buildhelper = (helpers) => ((h) => {
-    let helperobj = helpers(h),
-        namespace = buildoptfns(helperobj);
+  return helperobj.TAG_NAMES.reduce((hhoptsfn, tagname) => (
+    hhoptsfn[tagname] = namespace[tagname],
+    hhoptsfn
+  ), hhopts);
+};
 
-    let hhopts = opts => 
-      helperobj.TAG_NAMES.reduce((hhopts, cur) => (
-        hhopts[cur] = function () {
-          return namespace[cur](opts, ...arguments);
-        },
-        hhopts
-      ), {});
-
-    hhopts.encodeid = encodeid;
-    hhopts.decodeid = decodeid;
-
-    return helperobj.TAG_NAMES.reduce((hhoptsfn, tagname) => (
-      hhoptsfn[tagname] = namespace[tagname],
-      hhoptsfn
-    ), hhopts);
-  });
-
-  o = buildhelper(hh);
-  o.svg = buildhelper(hhsvg);
-
-  return o;
-  
-})();
+export default Object.assign(buildhelper(hh), {
+  svg: buildhelper(hhsvg)
+})
