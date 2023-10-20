@@ -35,25 +35,24 @@ const buildoptfns = helperfns => helperfns.TAG_NAMES.reduce((hhh, cur) => {
     return helperfns[cur](...newargs)
   };
   
-  return hhh;
+  return hhh
 }, {});
 
 const buildhelper = helpers => h => {
-  let helperobj = helpers(h),
-      namespace = buildoptfns(helperobj);
-
-  let hhopts = opts => helperobj.TAG_NAMES.reduce((hhopts, cur) => (
+  const helperobj = helpers(h)
+  const namespace = buildoptfns(helperobj);
+  const hhopts = opts => helperobj.TAG_NAMES.reduce((hhopts, cur) => (
     hhopts[cur] = (...args) => namespace[cur](opts, ...args),
     hhopts
   ), {});
 
-  hhopts.encodeid = encodeid;
-  hhopts.decodeid = decodeid;
+  hhopts.encodeid = encodeid
+  hhopts.decodeid = decodeid
 
   return helperobj.TAG_NAMES.reduce((hhoptsfn, tagname) => (
     hhoptsfn[tagname] = namespace[tagname],
     hhoptsfn
-  ), hhopts);
+  ), hhopts)
 };
 
 export default Object.assign(buildhelper(hh), {
