@@ -1,31 +1,30 @@
 {
-  "name": "hyperscript-helpers-opts",
-  "main": "hyperscript-helpers-opts.js",
+  "name": "hypel",
+  "main": "hypel.js",
   "type": "module",
   "exports": {
-    "import": "./hyperscript-helpers-opts.js"
+    "import": "./hypel.js"
   },
   "files": [
-    "./hyperscript-helpers-opts.js"
+    "./hypel.js"
   ],
   "version": "0.2.1",
   "description": "Define hyperscript className and id attributes dynamically.",
   "author": "Chris <chris@bumblehead.com>",
-  "license" : "MIT",
+  "license": "MIT",
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iambumblehead/hyperscript-helpers-opts.git"
+    "url": "git+https://github.com/iambumblehead/hypel.git"
   },
-  "dependencies" : {
-    "html-tag-names": "^1.0.0",
-    "hyperscript-helpers" : "^3.0.3"
-  },
-  "devDependencies" : {
-    "vdom-to-html" : "^2.2.0",
-    "virtual-dom" : "^2.1.1",
-    "html" : "^0.0.10",
-    "jsdom": "^22.1.0"
+  "devDependencies": {
+    "html-tag-names": "^2.1.0",
+    "hyperscript": "^2.0.2",
+    "vdom-to-html": "^2.2.0",
+    "virtual-dom": "^2.1.1",
+    "html": "^0.0.10",
+    "jsdom": "^22.1.0",
+    "react": "^18.2.0"
   },
   "keywords": [
     "hyperscript",
@@ -33,6 +32,6 @@
     "dynamic class"
   ],
   "scripts" : {
-    "test" : "node --test ./*test.js"
+    "test" : "node --test"
   }
 }

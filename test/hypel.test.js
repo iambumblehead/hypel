@@ -10,7 +10,7 @@ import { JSDOM } from 'jsdom'
 import vdomtohtml from 'vdom-to-html'
 import html from 'html'
 import h from 'virtual-dom/h.js'
-import hho from './hyperscript-helpers-opts.js'
+import hho from '../hypel.js'
 
 const hh = hho(h);
 
