@@ -4,15 +4,36 @@
 
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import snabbdom from 'snabbdom'
 
 import { JSDOM } from 'jsdom'
 
 import vdomtohtml from 'vdom-to-html'
 import html from 'html'
 import h from 'virtual-dom/h.js'
-import hho from '../hypel.js'
+import hypel from '../hypel.js'
 
-const hh = hho(h);
+test('snabbdom', () => {
+  const dom = new JSDOM(`<!DOCTYPE html><body><div id="container"></div></body>`)
+
+  global.window = dom.window;
+  global.document = dom.window.document;
+
+  const patch = snabbdom.init([])
+  const { div, span, a } = hypel(snabbdom.h)
+
+  patch(document.getElementById('container'), (
+    div('#container.two.classes', {
+      on: { click: () => console.log('go') }
+    }, [
+      span('.bold', 'This is bold'), ' and this is just normal text',
+      a('.link', { props: { href: "/foo" } }, 'now go places!')
+    ])
+  ))
+  // console.log(dom.window.document.documentElement.outerHTML)
+})
+
+const hh = hypel(h);
 
 // page data
 const pagedataarr = [{
