@@ -21,7 +21,6 @@
     "html-tag-names": "^2.1.0",
     "hyperscript": "^2.0.2",
     "snabbdom": "3.5.1",
-    "html": "^0.0.10",
     "jsdom": "^22.1.0",
     "react": "^18.2.0"
   },

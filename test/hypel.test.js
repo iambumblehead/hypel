@@ -6,8 +6,8 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import snabbdom from 'snabbdom'
 import { JSDOM } from 'jsdom'
-import html from 'html'
 import hypel from '../hypel.js'
+import htmlRegexpFormat from './htmlRegexpFormat.js'
 
 test('snabbdom', () => {
   const dom = new JSDOM(`<!DOCTYPE html><body><div id="container"></div></body>`)
@@ -99,7 +99,7 @@ const div = hh.div({}, pagedataarr.map(data => {
   return page[data.pagetype].getvnode(data);
 }));
 
-const stringydom = html.prettyPrint(`
+const stringydom = (`
   <div>
     <nav id="page-topnav" class="nav">
       <ul class="nav-list">
@@ -124,14 +124,14 @@ test('should be compatible with browser dom', () => {
 
   global.window = dom.window;
   global.document = dom.window.document;
- 
+
   snabbdom.init([])(document.getElementById('container'), div)
 
   const navdata = pagedataarr[0]
   const elem = page[navdata.pagetype].getcontainerelem(navdata, dom.window)
 
   assert.strictEqual(
-    html.prettyPrint(dom.window.document.body.innerHTML),
-    stringydom)
+    htmlRegexpFormat(dom.window.document.body.innerHTML),
+    htmlRegexpFormat(stringydom))
   assert.ok(elem instanceof dom.window.Element)
 })
