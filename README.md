@@ -1,7 +1,7 @@
 hypel
 =====
 
-`hypel` creates dom elements in a streamlined way.
+`hypel` creates dom elements with vanilla javascript
 ``` javascript
 div('#app', [
   h1('hello everybody'),
@@ -10,15 +10,14 @@ div('#app', [
 ])
 ```
 
-`hypel` is used with `react`, `inferno`, `snabbdom` and other virtual-dom implementations. A compact snabbdom example,
+`hypel` is used with vdom implementations including `react`,n `inferno` and `snabbdom`. A compact example,
 ``` javascript
 import hypel from 'hypel'
 import snabbdom from 'snabbdom'
 
-const patch = snabbdom.init([])
 const { div, span, a } = hypel(snabbdom.h)
 
-patch(document.getElementById('container'), (
+snabbdom.init([])(document.getElementById('container'), (
   div('#container.two.classes', {
     // note: syntax for classNames, attributes and other
     // details differ depending upon virtual-dom library

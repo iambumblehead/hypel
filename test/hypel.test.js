@@ -5,12 +5,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import snabbdom from 'snabbdom'
-
 import { JSDOM } from 'jsdom'
-
-import vdomtohtml from 'vdom-to-html'
 import html from 'html'
-import h from 'virtual-dom/h.js'
 import hypel from '../hypel.js'
 
 test('snabbdom', () => {
@@ -19,10 +15,9 @@ test('snabbdom', () => {
   global.window = dom.window;
   global.document = dom.window.document;
 
-  const patch = snabbdom.init([])
   const { div, span, a } = hypel(snabbdom.h)
 
-  patch(document.getElementById('container'), (
+  snabbdom.init([])(document.getElementById('container'), (
     div('#container.two.classes', {
       on: { click: () => console.log('go') }
     }, [
@@ -30,10 +25,9 @@ test('snabbdom', () => {
       a('.link', { props: { href: "/foo" } }, 'now go places!')
     ])
   ))
-  // console.log(dom.window.document.documentElement.outerHTML)
 })
 
-const hh = hypel(h);
+const hh = hypel(snabbdom.h)
 
 // page data
 const pagedataarr = [{
@@ -85,10 +79,10 @@ const getpagenav = () => {
 
   p.getvnode = opt => (
     hh.nav(opt, '#:uid.nav', [
-      hh.ul(opt, '.nav-list', [
+      hh.ul(opt, '.nav-list', (
         opt.navitemarr && opt.navitemarr
           .map(navitem => hh.li(opt, '.nav-list-item .:type', navitem))
-      ])
+      ))
     ]));
 
   return p;
@@ -109,32 +103,35 @@ const stringydom = html.prettyPrint(`
   <div>
     <nav id="page-topnav" class="nav">
       <ul class="nav-list">
-        <li class="nav-list-item big">main</li>
-        <li class="nav-list-item big">faq</li>
+        <li class="nav-list-item  big">main</li>
+        <li class="nav-list-item  big">faq</li>
       </ul>
     </nav>
-    <img id="page-img1" class="img big">
-    <img id="page-img2" class="img big">
-    <img id="page-img3" class="img small">
+    <img id="page-img1" class="img  big">
+    <img id="page-img2" class="img  big">
+    <img id="page-img3" class="img  small">
     <nav id="page-bottomnav" class="nav">
       <ul class="nav-list">
-        <li class="nav-list-item small">phone</li>
-        <li class="nav-list-item small">contact</li>
+        <li class="nav-list-item  small">phone</li>
+        <li class="nav-list-item  small">contact</li>
       </ul>
     </nav>
   </div>`)
 
-test('should generate stringy dom', () => {
-  assert.strictEqual(html.prettyPrint(vdomtohtml(div)), stringydom)
-})
-
 test('should be compatible with browser dom', () => {
-  const dom = new JSDOM(`<!DOCTYPE html><body></body>`)
+  const dom = new JSDOM(
+    `<!DOCTYPE html><body><div id="container"></div></body>`)
 
-  dom.window.document.body.innerHTML = vdomtohtml(div)
+  global.window = dom.window;
+  global.document = dom.window.document;
+ 
+  snabbdom.init([])(document.getElementById('container'), div)
 
   const navdata = pagedataarr[0]
   const elem = page[navdata.pagetype].getcontainerelem(navdata, dom.window)
 
+  assert.strictEqual(
+    html.prettyPrint(dom.window.document.body.innerHTML),
+    stringydom)
   assert.ok(elem instanceof dom.window.Element)
 })
