@@ -1,38 +1,43 @@
 {
-  "name": "hyperscript-helpers-opts",
-  "main": "hyperscript-helpers-opts.js",
+  "name": "hypel",
   "type": "module",
-  "exports": {
-    "import": "./hyperscript-helpers-opts.js"
-  },
-  "files": [
-    "./hyperscript-helpers-opts.js"
-  ],
   "version": "0.2.1",
-  "description": "Define hyperscript className and id attributes dynamically.",
-  "author": "Chris <chris@bumblehead.com>",
-  "license" : "MIT",
+  "license": "MIT",
   "readmeFilename": "README.md",
+  "description": "Terse syntax for hyperscript",
+  "author": "Chris <chris@bumblehead.com>",
+  "main": "hypel.js",
+  "exports": {
+    "import": "./hypel.js"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iambumblehead/hyperscript-helpers-opts.git"
+    "url": "git+https://github.com/iambumblehead/hypel.git"
   },
-  "dependencies" : {
-    "html-tag-names": "^1.0.0",
-    "hyperscript-helpers" : "^3.0.3"
-  },
-  "devDependencies" : {
-    "vdom-to-html" : "^2.2.0",
-    "virtual-dom" : "^2.1.1",
-    "html" : "^0.0.10",
-    "jsdom": "^22.1.0"
-  },
+  "files": [
+    "./hypel.js"
+  ],
   "keywords": [
+    "hyperscript-helpers",
+    "virtual-hyperscript",
+    "virtual-dom",
     "hyperscript",
     "dynamic id",
     "dynamic class"
   ],
+  "devDependencies": {
+    "inferno-hyperscript": "8.2.2",
+    "inferno-server": "8.2.2",
+    "html-tag-names": "^2.1.0",
+    "hyperscript": "^2.0.2",
+    "snabbdom": "3.5.1",
+    "eslint": "^8.51.0",
+    "jsdom": "^22.1.0",
+    "react": "^18.2.0"
+  },
   "scripts" : {
-    "test" : "node --test ./*test.js"
+    "lint": "eslint .",
+    "test" : "node --test",
+    "prepublishOnly": "npm run lint && npm test"
   }
 }
