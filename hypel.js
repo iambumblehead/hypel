@@ -1,6 +1,6 @@
 const isSelectorRe = /^[.#]/
 const nsSepPlainRe = /\//g
-const nsSepEncodeRe = /\:/g
+const nsSepEncodeRe = /:/g
 const nsKeyRe = /:[^: -.#]*/g
 const node = h => tagName => (first, ...rest) => {
   if (isSelectorRe.test(first)) {
@@ -29,11 +29,11 @@ const TAG_NAMES = [
   'meter', 'multicol', 'nav', 'nextid', 'nobr', 'noembed', 'noframes',
   'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param',
   'picture', 'plaintext', 'pre', 'progress', 'q', 'rb', 'rbc', 'rp', 'rt',
-  'rtc', 'ruby', 's', 'samp', 'script', 'search', 'section', 'select', 'shadow', 'slot',
-  'small', 'source', 'spacer', 'span', 'strike', 'strong', 'style', 'sub',
-  'summary', 'sup', 'svg', 'table', 'tbody', 'td', 'template', 'textarea',
-  'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'tt', 'u', 'ul',
-  'var', 'video', 'wbr', 'xmp'
+  'rtc', 'ruby', 's', 'samp', 'script', 'search', 'section', 'select', 'shadow',
+  'slot', 'small', 'source', 'spacer', 'span', 'strike', 'strong', 'style',
+  'sub', 'summary', 'sup', 'svg', 'table', 'tbody', 'td', 'template',
+  'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'tt', 'u',
+  'ul', 'var', 'video', 'wbr', 'xmp'
 ]
 
 // https://www.w3.org/TR/SVG/eltindex.html
@@ -83,34 +83,33 @@ const hypelsvg = h => {
 // var div = h('div.hello/world#hello/world');
 // div.properties.className; // helloa
 // div.properties.id;        // hello
-const encodeid = idstr => idstr.replace(nsSepPlainRe, ':');
-const decodeid = idstr => idstr.replace(nsSepEncodeRe, '/');
+const encodeid = idstr => idstr.replace(nsSepPlainRe, ':')
+const decodeid = idstr => idstr.replace(nsSepEncodeRe, '/')
 const getoptsclassidstr = (opts, classidstr) => (
   encodeid(classidstr.replace(nsKeyRe, m => (
     m = m.slice(1),
     m = m in opts ? String(opts[m]) : m,
     m
-  )))
-);
+  ))))
 
 const buildoptfns = helperfns => helperfns.TAG_NAMES.reduce((hhh, cur) => (
   hhh[cur] = (...args) => {
     const newargs = typeof args[1] === 'string'
-      ? [ getoptsclassidstr(args[0], args[1]), ...args.slice(2)]
-      : args.slice(1);
+      ? [ getoptsclassidstr(args[0], args[1]), ...args.slice(2) ]
+      : args.slice(1)
 
     return helperfns[cur](...newargs)
   },
   hhh
-), {});
+), {})
 
 const buildhelper = helpers => h => {
   const helperobj = helpers(h)
-  const namespace = buildoptfns(helperobj);
+  const namespace = buildoptfns(helperobj)
   const hhopts = opts => helperobj.TAG_NAMES.reduce((hhopts, cur) => (
     hhopts[cur] = (...args) => namespace[cur](opts, ...args),
     hhopts
-  ), {});
+  ), {})
 
   hhopts.encodeid = encodeid
   hhopts.decodeid = decodeid
@@ -119,16 +118,13 @@ const buildhelper = helpers => h => {
     hhoptsfn[tagname] = namespace[tagname],
     hhoptsfn
   ), hhopts)
-};
-
+}
 
 const hypelns = buildhelper(hypel)
-const hypelnssvg = buildhelper(hypelsvg)
 
 export {
   hypel as default,
   hypel,
   hypelsvg,
-  hypelns,
-  hypelnssvg,
+  hypelns
 }

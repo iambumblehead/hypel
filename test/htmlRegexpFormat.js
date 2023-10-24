@@ -17,11 +17,12 @@ export default htmlstr => {
         .map(n => n.replace(/^[ ]*/, ''))
         .join(''))
   
-  let indent = -1
-  let opentags = []
-  let previousIsClosing = false
-  let previousIsSelfClosing = false
-  const final = htmlstr.replace(tagRe, (match, offset, string) => {
+  let indent = -1,
+      opentags = [],
+      previousIsClosing = false,
+      previousIsSelfClosing = false
+
+  const final = htmlstr.replace(tagRe, match => {
     const isSelfClosing = selfClosingRe.test(match)
     const isClosing = !isSelfClosing && closeRe.test(match)
     const newlineStart = (isClosing && !previousIsClosing) ? '\n' : ''
@@ -49,7 +50,7 @@ export default htmlstr => {
 
   return final.split(/\n/g).map((line, i, arr) => (
     isTagRe.test(line)
-      ? line.replace(isTagRe, (match, g1, g2, offset, string) => {
+      ? line.replace(isTagRe, (match, g1, g2) => {
         const idAttrRe = (/ id=["'][^"']*["']/)
         if (idAttrRe.test(g2)) {
           // move id attribute to end of tag
@@ -60,6 +61,7 @@ export default htmlstr => {
           return match
         }
       })
-      : (((arr[i - 1].match(/[ ]*/)) || [])[0] || '') + '  ' + line.replace(/^[ ]*/, '')
+      : (((arr[i - 1].match(/[ ]*/)) || [])[0] || '')
+        + '  ' + line.replace(/^[ ]*/, '')
   )).join('\n')
 }

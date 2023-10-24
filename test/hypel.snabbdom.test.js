@@ -6,10 +6,11 @@ import { hypel, hypelns } from '../hypel.js'
 import htmlRegexpFormat from './htmlRegexpFormat.js'
 
 test('snabbdom', () => {
-  const dom = new JSDOM(`<!DOCTYPE html><body><div id="container"></div></body>`)
+  const dom = new JSDOM(
+    `<!DOCTYPE html><body><div id="container"></div></body>`)
 
-  global.window = dom.window;
-  global.document = dom.window.document;
+  global.window = dom.window
+  global.document = dom.window.document
 
   const { div, span, a } = hypel(snabbdom.h)
 
@@ -26,10 +27,10 @@ test('snabbdom', () => {
 const hh = hypelns(snabbdom.h)
 
 // page data
-const pagedataarr = [{
+const pagedataarr = [ {
   uid: 'page-topnav',
   pagetype: 'nav',
-  navitemarr: ['main', 'faq'],
+  navitemarr: [ 'main', 'faq' ],
   type: 'big',
   name: 'signin'
 }, {
@@ -52,26 +53,26 @@ const pagedataarr = [{
   pagetype: 'nav',
   type: 'small',
   name: 'general',
-  navitemarr: ['phone', 'contact']
-}];
+  navitemarr: [ 'phone', 'contact' ]
+} ]
 
 // static page objects
 const getpage = () => ({
   getcontainerelem: (opt, win) => (
     win.document.getElementById(opt.uid))
-});
+})
 
 const getpageimg = () => {
-  var p = getpage();
+  var p = getpage()
 
   p.getvnode = opt =>
-    hh.img(opt, '#:uid.img .:type');
+    hh.img(opt, '#:uid.img .:type')
 
-  return p;
-};
+  return p
+}
 
 const getpagenav = () => {
-  var p = getpage();
+  var p = getpage()
 
   p.getvnode = opt => (
     hh.nav(opt, '#:uid.nav', [
@@ -79,21 +80,21 @@ const getpagenav = () => {
         opt.navitemarr && opt.navitemarr
           .map(navitem => hh.li(opt, '.nav-list-item .:type', navitem))
       ))
-    ]));
+    ]))
 
-  return p;
-};
+  return p
+}
 
 // stored reference of static page objects
 const page = {
   img: getpageimg(),
   nav: getpagenav()
-};
+}
 
 // build page objects
 const div = hh.div({}, pagedataarr.map(data => {
-  return page[data.pagetype].getvnode(data);
-}));
+  return page[data.pagetype].getvnode(data)
+}))
 
 const stringydom = (`
   <div>
@@ -118,8 +119,8 @@ test('should be compatible with browser dom', () => {
   const dom = new JSDOM(
     `<!DOCTYPE html><body><div id="container"></div></body>`)
 
-  global.window = dom.window;
-  global.document = dom.window.document;
+  global.window = dom.window
+  global.document = dom.window.document
 
   snabbdom.init([])(document.getElementById('container'), div)
 
