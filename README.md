@@ -16,7 +16,7 @@ import hypel from 'hypel'
 import { h } from 'inferno-hyperscript'
 import { render } from 'inferno'
 
-const { div, span, a } = hypel(snabbdom.h)
+const { div, span, a } = hypel(h)
 
 render(
   div('#container.two.classes', {
@@ -24,9 +24,13 @@ render(
     // details differ depending upon virtual-dom library
     on: { click: () => console.log('go') }
   }, [
-    span('.bold', 'This is bold'), ' and this is just normal text',
+    span('.bold', 'This is bold'), ' and this is just normal text ',
     a('.link', { props: { href: "/foo" } }, 'now go places!')
   ]), document.getElementById('container'))
+// <div class="two classes" id="container">
+//   <span class="bold">This is bold</span> and this is just
+//   normal text <a class="link">now go places!</a>
+// </div>
 ```
 
 `hypel` includes a namespace feature that renders className and id attibutes from namespace values as below. Import `hypelns` or `hypelnssvg` to use this feature,
@@ -58,9 +62,9 @@ div(ns, '#:uid-app', [
 --------------------------------------------
 ### Credit
 
-Credit to [Ossi Hanhinen](https://github.com/ohanhi) and his (hyperscript-helpers package.)[https://github.com/ohanhi/hyperscript-helpers] I used his package for many years and requested him to update that package. His package was incompatible with the esm-bundling strategy I needed and it did not include the namespacing feature found here.
+Credit to [Ossi Hanhinen](https://github.com/ohanhi) and his [hyperscript-helpers package.](https://github.com/ohanhi/hyperscript-helpers) I used his package for many years and requested him to update that package. This package was created from hyperscrpt-helpers when that package was incompatible with the esm-bundling strategy I used.
 
-Ossi Hanhinen is appreciated and this package adds to his original one in the following ways,
+This package adds to the original hyperscript-helpers in these ways,
  * exports an esm module and declares "module" type in the package.json,
  * exports a single file,
  * uses node-native test-runner,

@@ -156,7 +156,4 @@ test('should be do namespacing', () => {
   )
 
   render(nsApp, document.getElementById('container'))
-
-  console.log(htmlRegexpFormat(
-    dom.window.document.body.firstChild.innerHTML))
 })
