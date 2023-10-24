@@ -49,7 +49,17 @@ export default htmlstr => {
 
   return final.split(/\n/g).map((line, i, arr) => (
     isTagRe.test(line)
-      ? line
+      ? line.replace(isTagRe, (match, g1, g2, offset, string) => {
+        const idAttrRe = (/ id=["'][^"']*["']/)
+        if (idAttrRe.test(g2)) {
+          // move id attribute to end of tag
+          const idAttr = g2.match(idAttrRe)[0]
+
+          return `<${g2.replace(idAttr, '') + idAttr}>`
+        } else {
+          return match
+        }
+      })
       : (((arr[i - 1].match(/[ ]*/)) || [])[0] || '') + '  ' + line.replace(/^[ ]*/, '')
   )).join('\n')
 }

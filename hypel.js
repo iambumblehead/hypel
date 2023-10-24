@@ -1,23 +1,16 @@
-// Filename: hyperscript-helpers-opts.js  
-// Timestamp: 2017.05.24-19:19:38 (last modified)
-// Author(s): bumblehead <chris@bumblehead.com>  
-
-const isValidString = param => typeof param === 'string' && param.length > 0;
-
-const startsWith = (string, start) => string[0] === start;
-
-const isSelector = param =>
-  isValidString(param) && (startsWith(param, '.') || startsWith(param, '#'));
-
+const isSelectorRe = /^[.#]/
+const nsSepPlainRe = /\//g
+const nsSepEncodeRe = /\:/g
+const nsKeyRe = /:[^: -.#]*/g
 const node = h => tagName => (first, ...rest) => {
-  if (isSelector(first)) {
-    return h(tagName + first, ...rest);
+  if (isSelectorRe.test(first)) {
+    return h(tagName + first, ...rest)
   } else if (typeof first === 'undefined') {
-    return h(tagName);
+    return h(tagName)
   } else {
-    return h(tagName, first, ...rest);
+    return h(tagName, first, ...rest)
   }
-};
+}
 
 // The tag names are verified against html-tag-names in the tests
 // See https://github.com/ohanhi/hyperscript-helpers/issues/34 for the reason
@@ -41,19 +34,7 @@ const TAG_NAMES = [
   'summary', 'sup', 'svg', 'table', 'tbody', 'td', 'template', 'textarea',
   'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'tt', 'u', 'ul',
   'var', 'video', 'wbr', 'xmp'
-];
-
-const hh = h => {
-  const createTag = node(h);
-  const exported = { TAG_NAMES, isSelector, createTag };
-  TAG_NAMES.forEach(n => {
-    // Also support a first-letter-uppercase spelling to help avoid conflicts
-    // with other variables or Javascript reserved keywords such as 'var'
-    exported[n] = exported[n.charAt(0).toUpperCase() + n.slice(1)] =
-      createTag(n);
-  });
-  return exported;
-};
+]
 
 // https://www.w3.org/TR/SVG/eltindex.html
 // The tag names are verified against svg-tag-names in the tests
@@ -78,50 +59,50 @@ const TAG_NAMESSVG = [
   'solidcolor', 'stop', 'style', 'svg', 'switch', 'symbol', 'tbreak', 'text',
   'textArea', 'textPath', 'title', 'tref', 'tspan', 'unknown', 'use', 'video',
   'view', 'vkern'
-];
+]
 
-const hhsvg = h => {
-  const createTag = hh(h).createTag;
-  const exported = { TAG_NAMESSVG, createTag };
-  TAG_NAMESSVG.forEach(n => {
-    exported[n] = createTag(n);
-  });
-  return exported;
-};
+const hypel = h => {
+  const createTag = node(h)
+
+  return TAG_NAMES.reduce((accum, tag) => (
+    accum[tag] = accum[
+      tag.charAt(0).toUpperCase() + tag.slice(1)] = createTag(tag),
+    accum
+  ), { isSelector: n => isSelectorRe.test(n), createTag, TAG_NAMES })
+}
+
+const hypelsvg = h => {
+  const createTag = hypel(h).createTag
+
+  return TAG_NAMESSVG.reduce((accum, tag) => (
+    accum[tag] = createTag(tag),
+    accum
+  ), {})
+}
 
 // var div = h('div.hello/world#hello/world');
-// div.properties.className; // hello
+// div.properties.className; // helloa
 // div.properties.id;        // hello
-
-const encodeid = idstr => idstr.replace(/\//g, ':');
-
-const decodeid = idstr => idstr.replace(/\:/g, '/');
-
+const encodeid = idstr => idstr.replace(nsSepPlainRe, ':');
+const decodeid = idstr => idstr.replace(nsSepEncodeRe, '/');
 const getoptsclassidstr = (opts, classidstr) => (
-  encodeid(classidstr.replace(/:[^: -.#]*/g, m => (
+  encodeid(classidstr.replace(nsKeyRe, m => (
     m = m.slice(1),
     m = m in opts ? String(opts[m]) : m,
     m
   )))
 );
 
-const buildoptfns = helperfns => helperfns.TAG_NAMES.reduce((hhh, cur) => {
+const buildoptfns = helperfns => helperfns.TAG_NAMES.reduce((hhh, cur) => (
   hhh[cur] = (...args) => {
-    let newargs;
-
-    if (typeof args[1] === 'string') {
-      newargs = args.slice(2);
-      // try getting this to single line
-      newargs.splice(0, 0, getoptsclassidstr(args[0], args[1]));
-    } else {
-      newargs = args.slice(1);
-    }
+    const newargs = typeof args[1] === 'string'
+      ? [ getoptsclassidstr(args[0], args[1]), ...args.slice(2)]
+      : args.slice(1);
 
     return helperfns[cur](...newargs)
-  };
-  
-  return hhh
-}, {});
+  },
+  hhh
+), {});
 
 const buildhelper = helpers => h => {
   const helperobj = helpers(h)
@@ -141,12 +122,13 @@ const buildhelper = helpers => h => {
 };
 
 
-const hypel = Object.assign(buildhelper(hh), {
-  svg: buildhelper(hhsvg)
-})
+const hypelns = buildhelper(hypel)
+const hypelnssvg = buildhelper(hypelsvg)
 
 export {
   hypel as default,
-  hh as hypelem,
-  hhsvg as hypelsvg
+  hypel,
+  hypelsvg,
+  hypelns,
+  hypelnssvg,
 }

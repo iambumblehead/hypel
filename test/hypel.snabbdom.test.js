@@ -1,12 +1,8 @@
-// Filename: start.js  
-// Timestamp: 2016.02.22-12:21:04 (last modified)
-// Author(s): bumblehead <chris@bumblehead.com>
-
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import snabbdom from 'snabbdom'
 import { JSDOM } from 'jsdom'
-import hypel from '../hypel.js'
+import { hypel, hypelns } from '../hypel.js'
 import htmlRegexpFormat from './htmlRegexpFormat.js'
 
 test('snabbdom', () => {
@@ -27,7 +23,7 @@ test('snabbdom', () => {
   ))
 })
 
-const hh = hypel(snabbdom.h)
+const hh = hypelns(snabbdom.h)
 
 // page data
 const pagedataarr = [{

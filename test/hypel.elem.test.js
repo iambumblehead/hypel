@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import crypto from 'crypto'
-import {hypelem} from '../hypel.js'
+import {hypel} from '../hypel.js'
 import h from 'hyperscript'
 import {htmlTagNames} from 'html-tag-names'
 
@@ -18,7 +18,7 @@ const fnnull = elem => {
 }
 
 test('div', () => {
-  const { div, Div } = hypelem(h)
+  const { div, Div } = hypel(h)
   const attrs = { draggable: 'true', 'data-id': 'dataid' }
   const children = ['betty', 'bob', 'june', 'jenny']
   
@@ -31,7 +31,7 @@ test('div', () => {
 })
 
 test('arbitrary tag', () => {
-  const helpers = hypelem(h)
+  const helpers = hypel(h)
   const attrs = { draggable: 'true', 'data-id': 'dataid' }
   const children = ['betty', 'bob', 'june', 'jenny']
 
@@ -49,7 +49,7 @@ test('arbitrary tag', () => {
 })
 
 test('custom tag', () => {
-  const helpers = hypelem(h)
+  const helpers = hypel(h)
   const tag = crypto.randomBytes(32).toString('hex').replace(/\d/g, '');
   const Tag = tag.charAt(0).toUpperCase() + tag.slice(1)
   const attrs = { draggable: 'true', 'data-id': 'dataid' }
@@ -65,7 +65,7 @@ test('custom tag', () => {
 })
 
 test('isSelector', () => {
-  const helpers = hypelem(h)
+  const helpers = hypel(h)
 
   assert.ok(helpers.isSelector('.anystring'))
   assert.ok(helpers.isSelector('#anystring'))
@@ -73,7 +73,7 @@ test('isSelector', () => {
 })
 
 test('arbitrary selector', () => {
-  const { div } = hypelem(h)
+  const { div } = hypel(h)
   const name = crypto.randomBytes(32).toString('hex').replace(/\d/g, '');
   const attrs = { draggable: 'true', 'data-id': 'dataid' }
   const children = ['betty', 'bob', 'june', 'jenny']

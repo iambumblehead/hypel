@@ -10,14 +10,15 @@ div('#app', [
 ])
 ```
 
-`hypel` is used with vdom implementations including `react`,n `inferno` and `snabbdom`. A compact example,
+`hypel` is used with vdom implementations such as `react` or  `inferno`. A compact example,
 ``` javascript
 import hypel from 'hypel'
-import snabbdom from 'snabbdom'
+import { h } from 'inferno-hyperscript'
+import { render } from 'inferno'
 
 const { div, span, a } = hypel(snabbdom.h)
 
-snabbdom.init([])(document.getElementById('container'), (
+render(
   div('#container.two.classes', {
     // note: syntax for classNames, attributes and other
     // details differ depending upon virtual-dom library
@@ -25,31 +26,48 @@ snabbdom.init([])(document.getElementById('container'), (
   }, [
     span('.bold', 'This is bold'), ' and this is just normal text',
     a('.link', { props: { href: "/foo" } }, 'now go places!')
+  ]), document.getElementById('container'))
+```
+
+`hypel` includes a namespace feature that renders className and id attibutes from namespace values as below. Import `hypelns` or `hypelnssvg` to use this feature,
+``` javascript
+import { hypelns } from 'hypel'
+import { h } from 'inferno-hyperscript'
+
+const { div, h1, ul, li } = hypelns(h)
+const ns = { uid: '123' } // use any key namea
+const items = [
+  { id: 'item1', title: 'item 1!'},
+  { id: 'item2', title: 'item 2!'}]
+
+div(ns, '#:uid-app', [
+  h1(ns, 'hello everybody'),
+    ul(ns, '#:uid-bestest-menu', items.map(item => (
+      li(ns, '#:uid-item-'+item.id, item.title))))
   ])
-))
+)
+// <div id="123-app">
+//   <h1>hello everybody</h1>
+//   <ul id="123-bestest-menu">
+//     <li id="123-item-item1">item 1!</li>
+//     <li id="123-item-item2">item 2!</li>
+//   </ul>
+// </div>
 ```
 
 --------------------------------------------
+### Credit
 
+Credit to [Ossi Hanhinen](https://github.com/ohanhi) and his (hyperscript-helpers package.)[https://github.com/ohanhi/hyperscript-helpers] I used his package for many years and requested him to update that package. His package was incompatible with the esm-bundling strategy I needed and it did not include the namespacing feature found here.
 
-
-
-Define hyperscript className and id attributes dynamically.
-
-```javascript
-import h from 'virtual-dom/h';
-import hh from 'hyperscript-helpers-opts'
-
-const hho = hh(h)({
-  uid : 'page-img',
-  type : 'big'
-});
-  
-hho.img('#:uid.img.:type');
-// <img id="page-img" class="img big">
-```
-
-hyperscript-helpers functions are defined with an object that is used to populate dynamic regions of the className and id string..
+Ossi Hanhinen is appreciated and this package adds to his original one in the following ways,
+ * exports an esm module and declares "module" type in the package.json,
+ * exports a single file,
+ * uses node-native test-runner,
+ * examples demonstrate more vdom packages; snabbdom, inferno and react,
+ * adds a namespacing feature,
+ * adds github ci for tests,
+ * smaller package size
 
 
 [0]: http://www.bumblehead.com                            "bumblehead"

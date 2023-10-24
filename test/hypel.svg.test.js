@@ -1,9 +1,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { hypelem, hypelsvg } from '../hypel.js'
+import { hypel, hypelsvg } from '../hypel.js'
 import h from 'hyperscript'
 
-const { svg } = hypelem(h)
+const { svg } = hypel(h)
 const { rect } = hypelsvg(h)
 
 test('svg', () => {

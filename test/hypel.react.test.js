@@ -3,10 +3,10 @@ import assert from 'node:assert/strict'
 import crypto from 'crypto'
 import React from 'react'
 import {htmlTagNames} from 'html-tag-names'
-import { hypelem } from '../hypel.js'
+import { hypel } from '../hypel.js'
 
 test('div', () => {
-  const { div } = hypelem(React.createElement)
+  const { div } = hypel(React.createElement)
   const attrs = { draggable: 'true', 'data-id': 'dataid' }
   const children = ['betty', 'bob', 'june', 'jenny']
   
@@ -19,7 +19,7 @@ test('div', () => {
 })
 
 test('arbitrary tag', () => {
-  const helpers = hypelem(React.createElement)
+  const helpers = hypel(React.createElement)
   const attrs = { draggable: 'true', 'data-id': 'dataid' }
   const children = ['betty', 'bob', 'june', 'jenny']
 
@@ -37,7 +37,7 @@ test('arbitrary tag', () => {
 })
 
 test('isSelector', () => {
-  const helpers = hypelem(React.createElement)
+  const helpers = hypel(React.createElement)
 
   assert.ok(helpers.isSelector('.anystring'))
   assert.ok(helpers.isSelector('#anystring'))
@@ -45,7 +45,7 @@ test('isSelector', () => {
 })
 
 test('arbitrary selector', () => {
-  const { div } = hypelem(React.createElement)
+  const { div } = hypel(React.createElement)
   const name = crypto.randomBytes(32).toString('hex').replace(/\d/g, '');
   const attrs = { draggable: 'true', 'data-id': 'dataid' }
   const children = ['betty', 'bob', 'june', 'jenny']
