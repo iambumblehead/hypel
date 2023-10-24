@@ -109,10 +109,7 @@ const buildhelper = helpers => h => {
   const hhopts = opts => helperobj.TAG_NAMES.reduce((hhopts, cur) => (
     hhopts[cur] = (...args) => namespace[cur](opts, ...args),
     hhopts
-  ), {})
-
-  hhopts.encodeid = encodeid
-  hhopts.decodeid = decodeid
+  ), { encodeid, decodeid })
 
   return helperobj.TAG_NAMES.reduce((hhoptsfn, tagname) => (
     hhoptsfn[tagname] = namespace[tagname],

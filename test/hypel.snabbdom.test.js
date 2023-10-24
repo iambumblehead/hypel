@@ -66,7 +66,7 @@ const getpageimg = () => {
   var p = getpage()
 
   p.getvnode = opt =>
-    hh.img(opt, '#:uid.img .:type')
+    hh.img(opt, '#:uid.img.:type')
 
   return p
 }
@@ -78,7 +78,7 @@ const getpagenav = () => {
     hh.nav(opt, '#:uid.nav', [
       hh.ul(opt, '.nav-list', (
         opt.navitemarr && opt.navitemarr
-          .map(navitem => hh.li(opt, '.nav-list-item .:type', navitem))
+          .map(navitem => hh.li(opt, '.nav-list-item.:type', navitem))
       ))
     ]))
 
@@ -100,17 +100,17 @@ const stringydom = (`
   <div>
     <nav id="page-topnav" class="nav">
       <ul class="nav-list">
-        <li class="nav-list-item  big">main</li>
-        <li class="nav-list-item  big">faq</li>
+        <li class="nav-list-item big">main</li>
+        <li class="nav-list-item big">faq</li>
       </ul>
     </nav>
-    <img id="page-img1" class="img  big">
-    <img id="page-img2" class="img  big">
-    <img id="page-img3" class="img  small">
+    <img id="page-img1" class="img big">
+    <img id="page-img2" class="img big">
+    <img id="page-img3" class="img small">
     <nav id="page-bottomnav" class="nav">
       <ul class="nav-list">
-        <li class="nav-list-item  small">phone</li>
-        <li class="nav-list-item  small">contact</li>
+        <li class="nav-list-item small">phone</li>
+        <li class="nav-list-item small">contact</li>
       </ul>
     </nav>
   </div>`)
