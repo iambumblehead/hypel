@@ -62,7 +62,7 @@ div(ns, '#:uid-app', [
 --------------------------------------------
 ### Credit
 
-Credit to [Ossi Hanhinen](https://github.com/ohanhi) and his [hyperscript-helpers package.](https://github.com/ohanhi/hyperscript-helpers) I used his package for many years and requested him to update that package. This package was created from hyperscrpt-helpers when that package was incompatible with the esm-bundling strategy I used.
+Credit to [Ossi Hanhinen](https://github.com/ohanhi) and his [hyperscript-helpers package.](https://github.com/ohanhi/hyperscript-helpers) This package was created from hyperscrpt-helpers when that package was no longer maintaind and incompatible with the esm-bundling strategy I used.
 
 This package adds to the original hyperscript-helpers in these ways,
  * exports an esm module and declares "module" type in the package.json,
