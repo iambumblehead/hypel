@@ -89,7 +89,7 @@ const tryprefix = (opts, classstr, prop) => (
   prop = opts[prop + 'prefix'],
   prop && prop !== classstr ? prop + '.' + classstr : classstr)
 const getoptsclassidstr = (opts, classidstr, s) => (
-  s = encodeid(classidstr.replace(nsKeyRe, (m, offset, r) => (
+  s = encodeid(classidstr.replace(nsKeyRe, m => (
     m = m.slice(1),
     // classidstr.charCodeAt(offset + m.length + 1) === charCodeHyphen
     tryprefix(opts, m in opts ? String(opts[m]) : m, m)
