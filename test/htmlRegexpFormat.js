@@ -63,5 +63,5 @@ export default htmlstr => {
       })
       : (((arr[i - 1].match(/[ ]*/)) || [])[0] || '')
         + '  ' + line.replace(/^[ ]*/, '')
-  )).join('\n')
+  )).join('\n').trim()
 }
