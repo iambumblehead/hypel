@@ -159,22 +159,22 @@ test('should be do namespacing', () => {
 })
 
 const namespacingrootHTML = (`
-<div class="123 root">
+<div class="prefix 123">
   <h1>
     hello everybody
   </h1>
-  <ul class="123-bestest-menu">
-    <li class="123-item-item1">
+  <ul class="prefix 123-bestest-menu">
+    <li class="prefix 123-item-item1">
       item 1!
     </li>
-    <li class="123-item-item2">
+    <li class="prefix 123-item-item2">
       item 2!
     </li>
   </ul>
 </div>
 `).slice(1, -1)
 
-test('should be do namespacing, root', () => {
+test('should be do namespacing, prefix', () => {
   const dom = new JSDOM(
     `<!DOCTYPE html><body><div id="container"></div></body>`)
 
@@ -185,7 +185,7 @@ test('should be do namespacing, root', () => {
   const items = [
     { id: 'item1', title: 'item 1!'},
     { id: 'item2', title: 'item 2!'} ]
-  const ns = { uid: '123', uidroot: 'root' }
+  const ns = { uid: '123', uidprefix: 'prefix' }
   const nsApp = (
     div(ns, '.:uid', [
       h1(ns, 'hello everybody'),
