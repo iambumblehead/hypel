@@ -85,20 +85,16 @@ const hypelsvg = h => {
 // div.properties.id;        // hello
 const encodeid = idstr => idstr.replace(nsSepPlainRe, ':')
 const decodeid = idstr => idstr.replace(nsSepEncodeRe, '/')
-const charCodeHyphen = 45 // the char "-"
-const tryprefixroot = (opts, classstr, prop) => (
-  prop = opts[prop + 'root'],
-  prop && prop !== classstr ? classstr + '.' + prop : classstr)
+const tryprefix = (opts, classstr, prop) => (
+  prop = opts[prop + 'prefix'],
+  prop && prop !== classstr ? prop + '.' + classstr : classstr)
 const getoptsclassidstr = (opts, classidstr, s) => (
   s = encodeid(classidstr.replace(nsKeyRe, (m, offset, r) => (
     m = m.slice(1),
-    r = m in opts ? String(opts[m]) : m,
-    r = classidstr.charCodeAt(offset + m.length + 1) === charCodeHyphen
-      ? r : tryprefixroot(opts, r, m),
-    r
+    // classidstr.charCodeAt(offset + m.length + 1) === charCodeHyphen
+    tryprefix(opts, m in opts ? String(opts[m]) : m, m)
   ))),
-  s
-)
+  s)
 
 const buildoptfns = helperfns => helperfns.TAG_NAMES.reduce((hhh, cur) => (
   hhh[cur] = (...args) => {
