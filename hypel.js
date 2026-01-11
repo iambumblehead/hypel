@@ -86,18 +86,44 @@ const hypelsvg = h => {
 const encodeid = idstr => idstr.replace(nsSepPlainRe, ':')
 const decodeid = idstr => idstr.replace(nsSepEncodeRe, '/')
 const charCodeHyphen = 45 // the char "-"
-const tryprefix = (opts, classstr, prop, prefixname) => (
-  prop = opts[prop + prefixname],
-  prop && prop !== classstr ? prop + '.' + classstr : classstr)
-const getoptsclassidstr = (opts, classidstr, s) => (
-  s = encodeid(classidstr.replace(nsKeyRe, (m, offset, r) => (
-    m = m.slice(1),
-    r = m in opts ? String(opts[m]) : m,
-    r = classidstr.charCodeAt(offset + m.length + 1) === charCodeHyphen
-      ? r : tryprefix(opts, r, m, 'root'),
-    tryprefix(opts, r, m, 'prefix')
-  ))),
-  s)
+// const tryprefix = (opts, classstr, prop, prefixname) => (
+//   prop = opts[prop + prefixname],
+//   prop && prop !== classstr ? prop + '.' + classstr : classstr)
+const charCodeColon = 58
+const getoptsclassidstr = (opts, classidstr, pos) => {
+  if (!classidstr)
+    return ''
+
+  if (classidstr.startsWith('ui')) {
+    const thirdchar = classidstr.charCodeAt(2)
+    if (thirdchar === charCodeHyphen || thirdchar === charCodeColon) {
+      if (opts.uiprefix) {
+        const full = '.' + opts.uiprefix + '.' + opts.ui
+        if (thirdchar === charCodeColon) {
+          classidstr = (
+            opts.uiroot ? '.' + opts.uiroot + full : full
+          ) + classidstr.slice(3)
+        } else {
+          pos = classidstr.indexOf(':', 3)
+          classidstr = full
+            + classidstr.slice(2, pos) + classidstr.slice(pos + 1)
+        }
+      } else {
+        classidstr = classidstr.slice(thirdchar === charCodeColon
+          ? 3
+          : classidstr.indexOf(':', 3) + 1)
+      }
+    }
+  }
+
+  pos = classidstr.indexOf('#:key')
+  if (pos > -1)
+    classidstr = classidstr.slice(0, pos + 1)
+      + opts.key.replace(nsSepPlainRe, ':')
+      + classidstr.slice(pos + 5)
+
+  return classidstr
+}
 
 const buildoptfns = helperfns => helperfns.TAG_NAMES.reduce((hhh, cur) => (
   hhh[cur] = (...args) => {
@@ -110,8 +136,8 @@ const buildoptfns = helperfns => helperfns.TAG_NAMES.reduce((hhh, cur) => (
   hhh
 ), {})
 
-const buildhelper = helpers => h => {
-  const helperobj = helpers(h)
+const buildhelper = h => spec => {
+  const helperobj = h(spec)
   const namespace = buildoptfns(helperobj)
   const hhopts = opts => helperobj.TAG_NAMES.reduce((hhopts, cur) => (
     hhopts[cur] = (...args) => namespace[cur](opts, ...args),

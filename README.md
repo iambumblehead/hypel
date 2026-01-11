@@ -2,7 +2,7 @@ hypel
 =====
 
 `hypel` creates dom elements with vanilla javascript
-``` javascript
+```javascript
 div('#app', [
   h1('hello everybody'),
   ul('#bestest-menu', items.map(item => (
