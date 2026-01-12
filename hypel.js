@@ -58,12 +58,28 @@ const TAG_NAMESSVG = [
 
 const toUpperFirst = str => str.charAt(0).toUpperCase() + str.slice(1)
 
+// cryptic-looking recursion here allows a tag hook to return another
+// hook and so on, so that tag calls may accumulate data to resolve
+// final hnode,
+// ```javascript
+// span = tags.span({id: '123'})
+// span(':id', 'hello world')
+// // <span id="123">hello world</span>
+// ```
+const hookedTag = (tag, hook, res) => (...args) => {
+  res = hook(args)
+
+  return typeof res === 'function'
+    ? hookedTag(tag, res)
+    : tag.apply(0, res)
+}
+
 const hypel = (h, hook) => {
   const createTag = node(h)
 
   return TAG_NAMES.reduce((accum, tag) => (
     accum[tag] = accum[toUpperFirst(tag)] = typeof hook === 'function'
-      ? (tag => (...args) => tag.apply(0, hook(args)))(createTag(tag))
+      ? (tag => hookedTag(tag, hook))(createTag(tag))
       : createTag(tag),
     accum
   ), { isSelector, createTag, TAG_NAMES })

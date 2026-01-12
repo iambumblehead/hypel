@@ -306,3 +306,48 @@ test('should do namespacing, :ui and root, with prefix', () => {
     renderstr(span('ui-author-label:#:key---part', x, 'hello')),
     '<span class="content uiblock-author-label" id="xkey---part">hello</span>')
 })
+
+test('should do lazy namespacing', () => {
+  const dom = new JSDOM(
+    `<!DOCTYPE html><body></body>`)
+
+  global.window = dom.window
+  global.document = dom.window.document
+
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec && 'ui' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2))
+    : isxspec(args[0])
+      ? args2 => [classidstrTransform(args[0], args2[0])].concat(args2.slice(1))
+      : args)
+  const renderstr = vnode => (
+    render(vnode, document.body), document.body.innerHTML)
+  const x = {key: 'xkey', ui: 'uiblock', uiprefix: 'content'}
+  const span = tags.span(x)
+
+  assert.strictEqual(
+    renderstr(span('ui:', 'hello')),
+    '<span class="content uiblock">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:', 'hello')),
+    '<span class="content uiblock-author-label">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui:#:key', 'hello')),
+    '<span class="content uiblock" id="xkey">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui:#:key---part', 'hello')),
+    '<span class="content uiblock" id="xkey---part">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:#:key', 'hello')),
+    '<span class="content uiblock-author-label" id="xkey">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:#:key---part', 'hello')),
+    '<span class="content uiblock-author-label" id="xkey---part">hello</span>')
+})
