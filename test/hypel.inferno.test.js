@@ -69,17 +69,17 @@ test('should be compatible with browser dom', () => {
     name: 'signin'
   }, {
     key: 'page-img1',
-    prefix: 'img',  
+    prefix: 'img',
     type: 'big',
     name: 'fun image 1'
   }, {
     key: 'page-img2',
-    prefix: 'img',  
+    prefix: 'img',
     type: 'big',
     name: 'fun image 2'
   }, {
     key: 'page-img3',
-    prefix: 'img',  
+    prefix: 'img',
     type: 'small',
     name: 'fun image 3'
   }, {
@@ -139,7 +139,7 @@ test('should be do namespacing', () => {
     && typeof xspec === 'object'
     && 'key' in xspec
   const tags = hypel(h, args => isxspec(args[1])
-    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)  
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
 
   const { div, h1, ul, li } = tags
   const items = [
@@ -254,7 +254,7 @@ test('should do namespacing, :ui and root, sans prefix', () => {
 
   assert.strictEqual(
     renderstr(span('ui:#:key---part', x, 'hello')),
-    '<span id="xkey---part">hello</span>')  
+    '<span id="xkey---part">hello</span>')
 
   assert.strictEqual(
     renderstr(span('ui-author-label:#:key', x, 'hello')),
@@ -296,7 +296,7 @@ test('should do namespacing, :ui and root, with prefix', () => {
 
   assert.strictEqual(
     renderstr(span('ui:#:key---part', x, 'hello')),
-    '<span class="content uiblock" id="xkey---part">hello</span>')  
+    '<span class="content uiblock" id="xkey---part">hello</span>')
 
   assert.strictEqual(
     renderstr(span('ui-author-label:#:key', x, 'hello')),

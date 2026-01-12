@@ -1,15 +1,11 @@
 const isSelector = str => (
   (str = String(str).charCodeAt(0)), (str === 46 || str === 35))
 
-const node = h => tagName => (first, ...rest) => {
-  if (isSelector(first)) {
-    return h(tagName + first, ...rest)
-  } else if (typeof first === 'undefined') {
-    return h(tagName)
-  } else {
-    return h(tagName, first, ...rest)
-  }
-}
+const node = h => tagName => (first, ...rest) => isSelector(first)
+  ? h(tagName + first, ...rest)
+  : typeof first === 'undefined'
+    ? h(tagName)
+    : h(tagName, first, ...rest)
 
 // The tag names are verified against html-tag-names in the tests
 // See https://github.com/ohanhi/hyperscript-helpers/issues/34 for the reason

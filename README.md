@@ -33,30 +33,11 @@ render(
 // </div>
 ```
 
-`hypel` includes a namespace feature that renders className and id attibutes from namespace values as below. Import `hypelns` or `hypelnssvg` to use this feature,
-``` javascript
-import { hypelns } from 'hypel'
-import { h } from 'inferno-hyperscript'
+### hook
 
-const { div, h1, ul, li } = hypelns(h)
-const ns = { uid: '123' } // use any key namea
-const items = [
-  { id: 'item1', title: 'item 1!'},
-  { id: 'item2', title: 'item 2!'}]
-
-div(ns, '#:uid-app', [
-  h1(ns, 'hello everybody'),
-    ul(ns, '#:uid-bestest-menu', items.map(item => (
-      li(ns, '#:uid-item-'+item.id, item.title))))
-  ])
-)
-// <div id="123-app">
-//   <h1>hello everybody</h1>
-//   <ul id="123-bestest-menu">
-//     <li id="123-item-item1">item 1!</li>
-//     <li id="123-item-item2">item 2!</li>
-//   </ul>
-// </div>
+`hypel` includes a hook feature, so that tag function arguments can be transformed through a hook. (try it out to see how it works)
+```javascript
+const tags = hypel(h, args => transformArgs(args))
 ```
 
 --------------------------------------------
@@ -69,12 +50,12 @@ This package adds to the original hyperscript-helpers in these ways,
  * exports a single file,
  * uses node-native test-runner,
  * examples demonstrate more vdom packages; snabbdom, inferno and react,
- * adds a namespacing feature,
+ * adds a hook feature,
  * adds github ci for tests,
  * smaller package size
 
 
-[0]: http://www.bumblehead.com                            "bumblehead"
+[0]: https://bumblehead.com                            "bumblehead"
 
 ![scrounge](https://github.com/iambumblehead/scroungejs/raw/main/img/hand.png)
 

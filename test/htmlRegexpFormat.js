@@ -16,7 +16,7 @@ export default htmlstr => {
         .split(/\n/g)
         .map(n => n.replace(/^[ ]*/, ''))
         .join(''))
-  
+
   let indent = -1,
       opentags = [],
       previousIsClosing = false,

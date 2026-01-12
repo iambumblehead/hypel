@@ -15,6 +15,7 @@ export default [
       }
     },
     rules: {
+      "no-trailing-spaces": [2],
       "global-require": 0,
       "no-sequences": 0,
       "semi": [2, "never"],
