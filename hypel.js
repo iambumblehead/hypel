@@ -1,9 +1,8 @@
-const isSelectorRe = /^[.#]/
-const nsSepPlainRe = /\//g
-const nsSepEncodeRe = /:/g
-const nsKeyRe = /:[^: -.#]*/g
+const isSelector = str => (
+  (str = String(str).charCodeAt(0)), (str === 46 || str === 35))
+
 const node = h => tagName => (first, ...rest) => {
-  if (isSelectorRe.test(first)) {
+  if (isSelector(first)) {
     return h(tagName + first, ...rest)
   } else if (typeof first === 'undefined') {
     return h(tagName)
@@ -61,14 +60,17 @@ const TAG_NAMESSVG = [
   'view', 'vkern'
 ]
 
-const hypel = h => {
+const toUpperFirst = str => str.charAt(0).toUpperCase() + str.slice(1)
+
+const hypel = (h, hook) => {
   const createTag = node(h)
 
   return TAG_NAMES.reduce((accum, tag) => (
-    accum[tag] = accum[
-      tag.charAt(0).toUpperCase() + tag.slice(1)] = createTag(tag),
+    accum[tag] = accum[toUpperFirst(tag)] = typeof hook === 'function'
+      ? (tag => (...args) => tag.apply(0, hook(args)))(createTag(tag))
+      : createTag(tag),
     accum
-  ), { isSelector: n => isSelectorRe.test(n), createTag, TAG_NAMES })
+  ), { isSelector, createTag, TAG_NAMES })
 }
 
 const hypelsvg = h => {
@@ -80,81 +82,8 @@ const hypelsvg = h => {
   ), {})
 }
 
-// var div = h('div.hello/world#hello/world');
-// div.properties.className; // helloa
-// div.properties.id;        // hello
-const encodeid = idstr => idstr.replace(nsSepPlainRe, ':')
-const decodeid = idstr => idstr.replace(nsSepEncodeRe, '/')
-const charCodeHyphen = 45 // the char "-"
-// const tryprefix = (opts, classstr, prop, prefixname) => (
-//   prop = opts[prop + prefixname],
-//   prop && prop !== classstr ? prop + '.' + classstr : classstr)
-const charCodeColon = 58
-const getoptsclassidstr = (opts, classidstr, pos) => {
-  if (!classidstr)
-    return ''
-
-  if (classidstr.startsWith('ui')) {
-    const thirdchar = classidstr.charCodeAt(2)
-    if (thirdchar === charCodeHyphen || thirdchar === charCodeColon) {
-      if (opts.uiprefix) {
-        const full = '.' + opts.uiprefix + '.' + opts.ui
-        if (thirdchar === charCodeColon) {
-          classidstr = (
-            opts.uiroot ? '.' + opts.uiroot + full : full
-          ) + classidstr.slice(3)
-        } else {
-          pos = classidstr.indexOf(':', 3)
-          classidstr = full
-            + classidstr.slice(2, pos) + classidstr.slice(pos + 1)
-        }
-      } else {
-        classidstr = classidstr.slice(thirdchar === charCodeColon
-          ? 3
-          : classidstr.indexOf(':', 3) + 1)
-      }
-    }
-  }
-
-  pos = classidstr.indexOf('#:key')
-  if (pos > -1)
-    classidstr = classidstr.slice(0, pos + 1)
-      + opts.key.replace(nsSepPlainRe, ':')
-      + classidstr.slice(pos + 5)
-
-  return classidstr
-}
-
-const buildoptfns = helperfns => helperfns.TAG_NAMES.reduce((hhh, cur) => (
-  hhh[cur] = (...args) => {
-    const newargs = typeof args[1] === 'string'
-      ? [ getoptsclassidstr(args[0], args[1]), ...args.slice(2) ]
-      : args.slice(1)
-
-    return helperfns[cur](...newargs)
-  },
-  hhh
-), {})
-
-const buildhelper = h => spec => {
-  const helperobj = h(spec)
-  const namespace = buildoptfns(helperobj)
-  const hhopts = opts => helperobj.TAG_NAMES.reduce((hhopts, cur) => (
-    hhopts[cur] = (...args) => namespace[cur](opts, ...args),
-    hhopts
-  ), { encodeid, decodeid })
-
-  return helperobj.TAG_NAMES.reduce((hhoptsfn, tagname) => (
-    hhoptsfn[tagname] = namespace[tagname],
-    hhoptsfn
-  ), hhopts)
-}
-
-const hypelns = buildhelper(hypel)
-
 export {
   hypel as default,
   hypel,
-  hypelsvg,
-  hypelns
+  hypelsvg
 }

@@ -3,8 +3,9 @@ import assert from 'node:assert/strict'
 import { render } from 'inferno'
 import { h } from 'inferno-hyperscript'
 import { JSDOM } from 'jsdom'
-import { hypel, hypelns } from '../hypel.js'
+import { hypel } from '../hypel.js'
 import htmlRegexpFormat from './htmlRegexpFormat.js'
+import classidstrTransform from './classidstrTransform.js'
 
 test('inferno', () => {
   const dom = new JSDOM(
@@ -44,22 +45,19 @@ const stringydom = (`
     </nav>
   </div>`)
 
-test.only('should be compatible with browser dom', () => {
+test('should be compatible with browser dom', () => {
   const dom = new JSDOM(
     `<!DOCTYPE html><body></body>`)
 
   global.window = dom.window
   global.document = dom.window.document
 
-  const hcreator = h => (nd, subj) => h({
-    key: nd.key,
-    ui: nd.type,
-    uiroot: nd.classNameOverride || subj.classNameNode,
-    uiprefix: nd.name
-  })
-
-  const tagsCreate = spec => hcreator(hypelns(h))(spec, {})
-  const tags = tagsCreate({key: 'ndkey', type: 'uiblock', name: 'content'}, {})
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec && 'ui' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
+  const div = tags.div
   const renderstr = vnode => (
     render(vnode, document.body), document.body.innerHTML)
 
@@ -90,23 +88,28 @@ test.only('should be compatible with browser dom', () => {
     type: 'small',
     name: 'general',
     navitemarr: [ 'phone', 'contact' ]
-  }]
+  }].map(n => Object.assign(n, {
+    key: n.key,
+    ui: n.type,
+    uiroot: n.classNameOverride || n.classNameNode,
+    uiprefix: n.name
+  }))
 
   const pagetypes = {
     img: {
-      getvnode: (spec, h) => {
-        const {img} = h(spec)
+      getvnode: (spec, tags) => {
+        const {img} = tags
 
         return (
-          img(`#:key.img .${spec.type}`))
+          img(`#:key.img .${spec.type}`, spec))
       }
     },
     nav: {
-      getvnode: (spec, h) => {
-        const {nav, ul, li} = h(spec)
+      getvnode: (spec, tags) => {
+        const {nav, ul, li} = tags
 
         return (
-          nav('#:key.nav', [
+          nav('#:key.nav', spec, [
             ul('.nav-list', (spec.navitemarr || []).map(navitem => (
               li(`.nav-list-item .${spec.type}`, navitem))
             ))
@@ -117,11 +120,11 @@ test.only('should be compatible with browser dom', () => {
   }
 
   const vnodearr = nodespecarr.map(spec => {
-    return pagetypes[spec.prefix].getvnode(spec, tagsCreate)
+    return pagetypes[spec.prefix].getvnode(spec, tags)
   })
 
   assert.strictEqual(
-    htmlRegexpFormat(renderstr(tags.div([vnodearr]))),
+    htmlRegexpFormat(renderstr(div([vnodearr]))),
     htmlRegexpFormat(stringydom))
 })
 
@@ -132,16 +135,22 @@ test('should be do namespacing', () => {
   global.window = dom.window
   global.document = dom.window.document
 
-  const { div, h1, ul, li } = hypelns(h)
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)  
+
+  const { div, h1, ul, li } = tags
   const items = [
     { key: 'item1', title: 'item 1!'},
     { key: 'item2', title: 'item 2!'} ]
   const ns = { key: '123' }
   const nsApp = (
-    div(ns, '#:key-app', [
-      h1(ns, 'hello everybody'),
-      ul(ns, '#:key-bestest-menu', items.map(item => (
-        li(ns, '#:key-item-'+item.key, item.title))))
+    div('#:key-app', ns, [
+      h1('hello everybody'),
+      ul('#:key-bestest-menu', ns, items.map(item => (
+        li('#:key-item-'+item.key, item, item.title))))
     ])
   )
 
@@ -155,10 +164,10 @@ test('should be do namespacing', () => {
       + '    hello everybody\n'
       + '  </h1>\n'
       + '  <ul id="123-bestest-menu">\n'
-      + '    <li id="123-item-item1">\n'
+      + '    <li id="item1-item-item1">\n'
       + '      item 1!\n'
       + '    </li>\n'
-      + '    <li id="123-item-item2">\n'
+      + '    <li id="item2-item-item2">\n'
       + '      item 2!\n'
       + '    </li>\n'
       + '  </ul>\n'
@@ -188,20 +197,21 @@ test('should be do namespacing, ui and root', () => {
   global.window = dom.window
   global.document = dom.window.document
 
-  // uiroot should be added no-matter what
-  // 'uiprefix' should become, simply, 'ui'
-  // format is changed ui: ui-item:
-  // if no 'ui' value is provided, remove any match
-  const { div, h1, ul, li } = hypelns(h)
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'ui' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
+  const { div, h1, ul, li } = tags
   const items = [
     { ui: 'item1', title: 'item 1!'},
     { ui: 'item2', title: 'item 2!'} ]
   const ns = { ui: '123', uiprefix: 'prefix', uiroot: 'root' }
   const nsApp = (
-    div(ns, 'ui:', [
-      h1(ns, 'hello everybody'),
-      ul(ns, 'ui-bestest-menu:', items.map(item => (
-        li(ns, 'ui-item-'+item.ui+':', item.title))))
+    div('ui:', ns, [
+      h1('hello everybody'),
+      ul('ui-bestest-menu:', ns, items.map(item => (
+        li('ui-item-'+item.ui+':', ns, item.title))))
     ])
   )
 
@@ -220,41 +230,39 @@ test('should do namespacing, :ui and root, sans prefix', () => {
   global.window = dom.window
   global.document = dom.window.document
 
-  const hcreator = h => (nd, subj) => h({
-    key: nd.key,
-    ui: nd.type,
-    uiroot: nd.classNameOverride || subj.classNameNode,
-    uiprefix: nd.name
-  })
-
-  const span = hcreator(hypelns(h))(
-    { key: 'ndkey', type: 'uiblock' }, {}).span
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec && 'ui' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
+  const span = tags.span
   const renderstr = vnode => (
     render(vnode, document.body), document.body.innerHTML)
+  const x = {key: 'xkey', ui: 'uiblock'}
 
   assert.strictEqual(
-    renderstr(span('ui:', 'hello')),
+    renderstr(span('ui:', x, 'hello')),
     '<span>hello</span>')
 
   assert.strictEqual(
-    renderstr(span('ui-author-label:', 'hello')),
+    renderstr(span('ui-author-label:', x, 'hello')),
     '<span>hello</span>')
 
   assert.strictEqual(
-    renderstr(span('ui:#:key', 'hello')),
-    '<span id="ndkey">hello</span>')
+    renderstr(span('ui:#:key', x, 'hello')),
+    '<span id="xkey">hello</span>')
 
   assert.strictEqual(
-    renderstr(span('ui:#:key---part', 'hello')),
-    '<span id="ndkey---part">hello</span>')  
+    renderstr(span('ui:#:key---part', x, 'hello')),
+    '<span id="xkey---part">hello</span>')  
 
   assert.strictEqual(
-    renderstr(span('ui-author-label:#:key', 'hello')),
-    '<span id="ndkey">hello</span>')
+    renderstr(span('ui-author-label:#:key', x, 'hello')),
+    '<span id="xkey">hello</span>')
 
   assert.strictEqual(
-    renderstr(span('ui-author-label:#:key---part', 'hello')),
-    '<span id="ndkey---part">hello</span>')  
+    renderstr(span('ui-author-label:#:key---part', x, 'hello')),
+    '<span id="xkey---part">hello</span>')
 })
 
 test('should do namespacing, :ui and root, with prefix', () => {
@@ -264,39 +272,37 @@ test('should do namespacing, :ui and root, with prefix', () => {
   global.window = dom.window
   global.document = dom.window.document
 
-  const hcreator = h => (nd, subj) => h({
-    key: nd.key,
-    ui: nd.type,
-    uiroot: nd.classNameOverride || subj.classNameNode,
-    uiprefix: nd.name
-  })
-
-  const span = hcreator(hypelns(h))(
-    { key: 'ndkey', type: 'uiblock', name: 'content' }, {}).span
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec && 'ui' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
+  const span = tags.span
   const renderstr = vnode => (
     render(vnode, document.body), document.body.innerHTML)
+  const x = {key: 'xkey', ui: 'uiblock', uiprefix: 'content'}
 
   assert.strictEqual(
-    renderstr(span('ui:', 'hello')),
+    renderstr(span('ui:', x, 'hello')),
     '<span class="content uiblock">hello</span>')
 
   assert.strictEqual(
-    renderstr(span('ui-author-label:', 'hello')),
+    renderstr(span('ui-author-label:', x, 'hello')),
     '<span class="content uiblock-author-label">hello</span>')
 
   assert.strictEqual(
-    renderstr(span('ui:#:key', 'hello')),
-    '<span class="content uiblock" id="ndkey">hello</span>')
+    renderstr(span('ui:#:key', x, 'hello')),
+    '<span class="content uiblock" id="xkey">hello</span>')
 
   assert.strictEqual(
-    renderstr(span('ui:#:key---part', 'hello')),
-    '<span class="content uiblock" id="ndkey---part">hello</span>')  
+    renderstr(span('ui:#:key---part', x, 'hello')),
+    '<span class="content uiblock" id="xkey---part">hello</span>')  
 
   assert.strictEqual(
-    renderstr(span('ui-author-label:#:key', 'hello')),
-    '<span class="content uiblock-author-label" id="ndkey">hello</span>')
+    renderstr(span('ui-author-label:#:key', x, 'hello')),
+    '<span class="content uiblock-author-label" id="xkey">hello</span>')
 
   assert.strictEqual(
-    renderstr(span('ui-author-label:#:key---part', 'hello')),
-    '<span class="content uiblock-author-label" id="ndkey---part">hello</span>')
+    renderstr(span('ui-author-label:#:key---part', x, 'hello')),
+    '<span class="content uiblock-author-label" id="xkey---part">hello</span>')
 })
