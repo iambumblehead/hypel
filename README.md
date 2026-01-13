@@ -1,8 +1,15 @@
 hypel
 =====
 
+[![npm][1]][2] [![install size][3]][4]
+
+[1]: https://img.shields.io/npm/v/hypel "hypel npm, badge"
+[2]: https://www.npmjs.com/package/hypel "hypel npm, link"
+[3]: https://packagephobia.now.sh/badge?p=hypel "hypel size, badge"
+[4]: https://packagephobia.now.sh/result?p=hypel "hypel size, link"
+
 `hypel` creates dom elements with vanilla javascript
-``` javascript
+```javascript
 div('#app', [
   h1('hello everybody'),
   ul('#bestest-menu', items.map(item => (
@@ -33,30 +40,11 @@ render(
 // </div>
 ```
 
-`hypel` includes a namespace feature that renders className and id attibutes from namespace values as below. Import `hypelns` or `hypelnssvg` to use this feature,
-``` javascript
-import { hypelns } from 'hypel'
-import { h } from 'inferno-hyperscript'
+### hook
 
-const { div, h1, ul, li } = hypelns(h)
-const ns = { uid: '123' } // use any key namea
-const items = [
-  { id: 'item1', title: 'item 1!'},
-  { id: 'item2', title: 'item 2!'}]
-
-div(ns, '#:uid-app', [
-  h1(ns, 'hello everybody'),
-    ul(ns, '#:uid-bestest-menu', items.map(item => (
-      li(ns, '#:uid-item-'+item.id, item.title))))
-  ])
-)
-// <div id="123-app">
-//   <h1>hello everybody</h1>
-//   <ul id="123-bestest-menu">
-//     <li id="123-item-item1">item 1!</li>
-//     <li id="123-item-item2">item 2!</li>
-//   </ul>
-// </div>
+`hypel` includes a hook feature, so that tag function arguments can be transformed through a hook. (try it out to see how it works)
+```javascript
+const tags = hypel(h, args => transformArgs(args))
 ```
 
 --------------------------------------------
@@ -69,21 +57,11 @@ This package adds to the original hyperscript-helpers in these ways,
  * exports a single file,
  * uses node-native test-runner,
  * examples demonstrate more vdom packages; snabbdom, inferno and react,
- * adds a namespacing feature,
+ * adds a hook feature,
  * adds github ci for tests,
  * smaller package size
 
 
-[0]: http://www.bumblehead.com                            "bumblehead"
+[0]: https://bumblehead.com                            "bumblehead"
 
 ![scrounge](https://github.com/iambumblehead/scroungejs/raw/main/img/hand.png)
-
-(The MIT License)
-
-Copyright (c) [Bumblehead][0] <chris@bumblehead.com>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

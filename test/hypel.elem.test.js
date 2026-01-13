@@ -21,7 +21,7 @@ test('div', () => {
   const { div, Div } = hypel(h)
   const attrs = { draggable: 'true', 'data-id': 'dataid' }
   const children = [ 'betty', 'bob', 'june', 'jenny' ]
-  
+
   assert.strictEqual(h('div').nodeName, div().nodeName)
   assert.strictEqual(h('div').nodeName, Div().nodeName)
 
@@ -40,7 +40,7 @@ test('arbitrary tag', () => {
     const Tag = tag.charAt(0).toUpperCase() + tag.slice(1)
     const hypeltag = helpers[tag]
     const hypelTag = helpers[Tag]
-    
+
     assert.strictEqual(h(tag).nodeName, hypeltag().nodeName)
     assert.strictEqual(h(tag).nodeName, hypelTag().nodeName)
     assert.deepEqual(fnnull(h(tag, attrs)), fnnull(hypeltag(attrs)))

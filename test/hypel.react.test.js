@@ -9,7 +9,7 @@ test('div', () => {
   const { div } = hypel(React.createElement)
   const attrs = { draggable: 'true', 'data-id': 'dataid' }
   const children = [ 'betty', 'bob', 'june', 'jenny' ]
-  
+
   assert.strictEqual(
     React.createElement('div').nodeName, div().nodeName)
 
@@ -28,7 +28,7 @@ test('arbitrary tag', () => {
     const Tag = tag.charAt(0).toUpperCase() + tag.slice(1)
     const hypeltag = helpers[tag]
     const hypelTag = helpers[Tag]
-    
+
     assert.strictEqual(React.createElement(tag).nodeName, hypeltag().nodeName)
     assert.strictEqual(React.createElement(tag).nodeName, hypelTag().nodeName)
     assert.deepEqual(React.createElement(tag, attrs), hypeltag(attrs))

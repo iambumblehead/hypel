@@ -2,8 +2,9 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import { JSDOM } from 'jsdom'
-import { hypel, hypelns } from '../hypel.js'
+import { hypel } from '../hypel.js'
 import htmlRegexpFormat from './htmlRegexpFormat.js'
+import classidstrTransform from './classidstrTransform.js'
 
 test('snabbdom', async () => {
   const dom = new JSDOM(
@@ -33,77 +34,73 @@ test('should be compatible with browser dom', async () => {
   global.document = dom.window.document
 
   const snabbdom = await import('snabbdom')
-  const hh = hypelns(snabbdom.h)
-
-  // page data
-  const pagedataarr = [ {
-    uid: 'page-topnav',
-    pagetype: 'nav',
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec && 'ui' in xspec
+  const tags = hypel(snabbdom.h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
+  const div = tags.div
+  const nodespecarr = [{
+    key: 'page-topnav',
+    prefix: 'nav',
     navitemarr: [ 'main', 'faq' ],
     type: 'big',
     name: 'signin'
   }, {
-    uid: 'page-img1',
-    pagetype: 'img',  
+    key: 'page-img1',
+    prefix: 'img',
     type: 'big',
     name: 'fun image 1'
   }, {
-    uid: 'page-img2',
-    pagetype: 'img',  
+    key: 'page-img2',
+    prefix: 'img',
     type: 'big',
     name: 'fun image 2'
   }, {
-    uid: 'page-img3',
-    pagetype: 'img',  
+    key: 'page-img3',
+    prefix: 'img',
     type: 'small',
-    name: 'fun image 3'  
+    name: 'fun image 3'
   }, {
-    uid: 'page-bottomnav',
-    pagetype: 'nav',
+    key: 'page-bottomnav',
+    prefix: 'nav',
     type: 'small',
     name: 'general',
     navitemarr: [ 'phone', 'contact' ]
-  } ]
-
-  // static page objects
-  const getpage = () => ({
-    getcontainerelem: (opt, win) => (
-      win.document.getElementById(opt.uid))
-  })
-
-  const getpageimg = () => {
-    var p = getpage()
-
-    p.getvnode = opt =>
-      hh.img(opt, '#:uid.img.:type')
-
-    return p
-  }
-
-  const getpagenav = () => {
-    var p = getpage()
-
-    p.getvnode = opt => (
-      hh.nav(opt, '#:uid.nav', [
-        hh.ul(opt, '.nav-list', (
-          opt.navitemarr && opt.navitemarr
-            .map(navitem => hh.li(opt, '.nav-list-item.:type', navitem))
-        ))
-      ]))
-
-    return p
-  }
-
-  // stored reference of static page objects
-  const page = {
-    img: getpageimg(),
-    nav: getpagenav()
-  }
-
-  // build page objects
-  const div = hh.div({}, pagedataarr.map(data => {
-    return page[data.pagetype].getvnode(data)
+  }].map(n => Object.assign(n, {
+    key: n.key,
+    ui: n.type,
+    uiroot: n.classNameOverride || n.classNameNode,
+    uiprefix: n.name
   }))
+
+  const pagetypes = {
+    img: {
+      getvnode: (spec, tags) => {
+        const {img} = tags
+
+        return (
+          img(`#:key.img.${spec.type}`, spec))
+      }
+    },
+    nav: {
+      getvnode: (spec, tags) => {
+        const {nav, ul, li} = tags
+
+        return (
+          nav('#:key.nav', spec, [
+            ul('.nav-list', (spec.navitemarr || []).map(navitem => (
+              li(`.nav-list-item.${spec.type}`, navitem))
+            ))
+          ])
+        )
+      }
+    }
+  }
+
+  const vnodearr = nodespecarr.map(spec => {
+    return pagetypes[spec.prefix].getvnode(spec, tags)
+  })
 
   const stringydom = (`
   <div>
@@ -124,14 +121,9 @@ test('should be compatible with browser dom', async () => {
     </nav>
   </div>`)
 
-
-  snabbdom.init([])(document.getElementById('container'), div)
-
-  const navdata = pagedataarr[0]
-  const elem = page[navdata.pagetype].getcontainerelem(navdata, dom.window)
+  snabbdom.init([])(document.body.firstElementChild, div({}, vnodearr))
 
   assert.strictEqual(
     htmlRegexpFormat(dom.window.document.body.innerHTML),
     htmlRegexpFormat(stringydom))
-  assert.ok(elem instanceof dom.window.Element)
 })

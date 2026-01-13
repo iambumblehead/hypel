@@ -3,8 +3,9 @@ import assert from 'node:assert/strict'
 import { render } from 'inferno'
 import { h } from 'inferno-hyperscript'
 import { JSDOM } from 'jsdom'
-import { hypel, hypelns } from '../hypel.js'
+import { hypel } from '../hypel.js'
 import htmlRegexpFormat from './htmlRegexpFormat.js'
+import classidstrTransform from './classidstrTransform.js'
 
 test('inferno', () => {
   const dom = new JSDOM(
@@ -24,79 +25,6 @@ test('inferno', () => {
     ])
   ), document.getElementById('container'))
 })
-
-// const hh = hypel(h)
-
-// page data
-const pagedataarr = [ {
-  uid: 'page-topnav',
-  pagetype: 'nav',
-  navitemarr: [ 'main', 'faq' ],
-  type: 'big',
-  name: 'signin'
-}, {
-  uid: 'page-img1',
-  pagetype: 'img',  
-  type: 'big',
-  name: 'fun image 1'
-}, {
-  uid: 'page-img2',
-  pagetype: 'img',  
-  type: 'big',
-  name: 'fun image 2'
-}, {
-  uid: 'page-img3',
-  pagetype: 'img',  
-  type: 'small',
-  name: 'fun image 3'  
-}, {
-  uid: 'page-bottomnav',
-  pagetype: 'nav',
-  type: 'small',
-  name: 'general',
-  navitemarr: [ 'phone', 'contact' ]
-} ]
-
-const hh = hypelns(h)
-// static page objects
-const getpage = () => ({
-  getcontainerelem: (opt, win) => (
-    win.document.getElementById(opt.uid))
-})
-
-const getpageimg = () => {
-  var p = getpage()
-
-  p.getvnode = opt =>
-    hh.img(opt, '#:uid.img .:type')
-
-  return p
-}
-
-const getpagenav = () => {
-  var p = getpage()
-
-  p.getvnode = opt => (
-    hh.nav(opt, '#:uid.nav', [
-      hh.ul(opt, '.nav-list', (
-        opt.navitemarr && opt.navitemarr
-          .map(navitem => hh.li(opt, '.nav-list-item .:type', navitem))
-      ))
-    ]))
-
-  return p
-}
-
-// stored reference of static page objects
-const page = {
-  img: getpageimg(),
-  nav: getpagenav()
-}
-
-// build page objects
-const div = hh.div({}, pagedataarr.map(data => {
-  return page[data.pagetype].getvnode(data)
-}))
 
 const stringydom = (`
   <div>
@@ -119,47 +47,135 @@ const stringydom = (`
 
 test('should be compatible with browser dom', () => {
   const dom = new JSDOM(
-    `<!DOCTYPE html><body><div id="container"></div></body>`)
+    `<!DOCTYPE html><body></body>`)
 
   global.window = dom.window
   global.document = dom.window.document
 
-  render(div, document.getElementById('container'))
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec && 'ui' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
+  const div = tags.div
+  const renderstr = vnode => (
+    render(vnode, document.body), document.body.innerHTML)
 
-  const navdata = pagedataarr[0]
-  const elem = page[navdata.pagetype].getcontainerelem(navdata, dom.window)
+  const nodespecarr = [{
+    key: 'page-topnav',
+    prefix: 'nav',
+    navitemarr: [ 'main', 'faq' ],
+    type: 'big',
+    name: 'signin'
+  }, {
+    key: 'page-img1',
+    prefix: 'img',
+    type: 'big',
+    name: 'fun image 1'
+  }, {
+    key: 'page-img2',
+    prefix: 'img',
+    type: 'big',
+    name: 'fun image 2'
+  }, {
+    key: 'page-img3',
+    prefix: 'img',
+    type: 'small',
+    name: 'fun image 3'
+  }, {
+    key: 'page-bottomnav',
+    prefix: 'nav',
+    type: 'small',
+    name: 'general',
+    navitemarr: [ 'phone', 'contact' ]
+  }].map(n => Object.assign(n, {
+    key: n.key,
+    ui: n.type,
+    uiroot: n.classNameOverride || n.classNameNode,
+    uiprefix: n.name
+  }))
+
+  const pagetypes = {
+    img: {
+      getvnode: (spec, tags) => {
+        const {img} = tags
+
+        return (
+          img(`#:key.img .${spec.type}`, spec))
+      }
+    },
+    nav: {
+      getvnode: (spec, tags) => {
+        const {nav, ul, li} = tags
+
+        return (
+          nav('#:key.nav', spec, [
+            ul('.nav-list', (spec.navitemarr || []).map(navitem => (
+              li(`.nav-list-item .${spec.type}`, navitem))
+            ))
+          ])
+        )
+      }
+    }
+  }
+
+  const vnodearr = nodespecarr.map(spec => {
+    return pagetypes[spec.prefix].getvnode(spec, tags)
+  })
 
   assert.strictEqual(
-    htmlRegexpFormat(dom.window.document.body.firstChild.innerHTML),
+    htmlRegexpFormat(renderstr(div([vnodearr]))),
     htmlRegexpFormat(stringydom))
-  assert.ok(elem instanceof dom.window.Element)
 })
 
 test('should be do namespacing', () => {
   const dom = new JSDOM(
-    `<!DOCTYPE html><body><div id="container"></div></body>`)
+    `<!DOCTYPE html><body></body>`)
 
   global.window = dom.window
   global.document = dom.window.document
 
-  const { div, h1, ul, li } = hypelns(h)
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
+
+  const { div, h1, ul, li } = tags
   const items = [
-    { id: 'item1', title: 'item 1!'},
-    { id: 'item2', title: 'item 2!'} ]
-  const ns = { uid: '123' }
+    { key: 'item1', title: 'item 1!'},
+    { key: 'item2', title: 'item 2!'} ]
+  const ns = { key: '123' }
   const nsApp = (
-    div(ns, '#:uid-app', [
-      h1(ns, 'hello everybody'),
-      ul(ns, '#:uid-bestest-menu', items.map(item => (
-        li(ns, '#:uid-item-'+item.id, item.title))))
+    div('#:key-app', ns, [
+      h1('hello everybody'),
+      ul('#:key-bestest-menu', ns, items.map(item => (
+        li('#:key-item-'+item.key, item, item.title))))
     ])
   )
 
-  render(nsApp, document.getElementById('container'))
+  const renderstr = vnode => (
+    render(vnode, document.body), document.body.innerHTML)
+
+  assert.strictEqual(
+    htmlRegexpFormat(renderstr(nsApp)), ''
+      + '<div id="123-app">\n'
+      + '  <h1>\n'
+      + '    hello everybody\n'
+      + '  </h1>\n'
+      + '  <ul id="123-bestest-menu">\n'
+      + '    <li id="item1-item-item1">\n'
+      + '      item 1!\n'
+      + '    </li>\n'
+      + '    <li id="item2-item-item2">\n'
+      + '      item 2!\n'
+      + '    </li>\n'
+      + '  </ul>\n'
+      + '</div>')
 })
 
 const namespacingrootHTML = (`
-<div class="prefix root 123">
+<div class="root prefix 123">
   <h1>
     hello everybody
   </h1>
@@ -174,29 +190,164 @@ const namespacingrootHTML = (`
 </div>
 `).slice(1, -1)
 
-test('should be do namespacing, prefix and root', () => {
+test('should be do namespacing, ui and root', () => {
   const dom = new JSDOM(
-    `<!DOCTYPE html><body><div id="container"></div></body>`)
+    `<!DOCTYPE html><body></body>`)
 
   global.window = dom.window
   global.document = dom.window.document
 
-  const { div, h1, ul, li } = hypelns(h)
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'ui' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
+  const { div, h1, ul, li } = tags
   const items = [
-    { id: 'item1', title: 'item 1!'},
-    { id: 'item2', title: 'item 2!'} ]
-  const ns = { uid: '123', uidprefix: 'prefix', uidroot: 'root' }
+    { ui: 'item1', title: 'item 1!'},
+    { ui: 'item2', title: 'item 2!'} ]
+  const ns = { ui: '123', uiprefix: 'prefix', uiroot: 'root' }
   const nsApp = (
-    div(ns, '.:uid', [
-      h1(ns, 'hello everybody'),
-      ul(ns, '.:uid-bestest-menu', items.map(item => (
-        li(ns, '.:uid-item-'+item.id, item.title))))
+    div('ui:', ns, [
+      h1('hello everybody'),
+      ul('ui-bestest-menu:', ns, items.map(item => (
+        li('ui-item-'+item.ui+':', ns, item.title))))
     ])
   )
 
-  render(nsApp, document.getElementById('container'))
+  const renderstr = vnode => (
+    render(vnode, document.body), document.body.innerHTML)
 
   assert.deepStrictEqual(
-    htmlRegexpFormat(dom.window.document.body.firstChild.innerHTML),
+    htmlRegexpFormat(renderstr(nsApp)),
     namespacingrootHTML)
+})
+
+test('should do namespacing, :ui and root, sans prefix', () => {
+  const dom = new JSDOM(
+    `<!DOCTYPE html><body></body>`)
+
+  global.window = dom.window
+  global.document = dom.window.document
+
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec && 'ui' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
+  const span = tags.span
+  const renderstr = vnode => (
+    render(vnode, document.body), document.body.innerHTML)
+  const x = {key: 'xkey', ui: 'uiblock'}
+
+  assert.strictEqual(
+    renderstr(span('ui:', x, 'hello')),
+    '<span>hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:', x, 'hello')),
+    '<span>hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui:#:key', x, 'hello')),
+    '<span id="xkey">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui:#:key---part', x, 'hello')),
+    '<span id="xkey---part">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:#:key', x, 'hello')),
+    '<span id="xkey">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:#:key---part', x, 'hello')),
+    '<span id="xkey---part">hello</span>')
+})
+
+test('should do namespacing, :ui and root, with prefix', () => {
+  const dom = new JSDOM(
+    `<!DOCTYPE html><body></body>`)
+
+  global.window = dom.window
+  global.document = dom.window.document
+
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec && 'ui' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2)) : args)
+  const span = tags.span
+  const renderstr = vnode => (
+    render(vnode, document.body), document.body.innerHTML)
+  const x = {key: 'xkey', ui: 'uiblock', uiprefix: 'content'}
+
+  assert.strictEqual(
+    renderstr(span('ui:', x, 'hello')),
+    '<span class="content uiblock">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:', x, 'hello')),
+    '<span class="content uiblock-author-label">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui:#:key', x, 'hello')),
+    '<span class="content uiblock" id="xkey">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui:#:key---part', x, 'hello')),
+    '<span class="content uiblock" id="xkey---part">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:#:key', x, 'hello')),
+    '<span class="content uiblock-author-label" id="xkey">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:#:key---part', x, 'hello')),
+    '<span class="content uiblock-author-label" id="xkey---part">hello</span>')
+})
+
+test('should do lazy namespacing', () => {
+  const dom = new JSDOM(
+    `<!DOCTYPE html><body></body>`)
+
+  global.window = dom.window
+  global.document = dom.window.document
+
+  const isxspec = xspec => xspec
+    && typeof xspec === 'object'
+    && 'key' in xspec && 'ui' in xspec
+  const tags = hypel(h, args => isxspec(args[1])
+    ? [classidstrTransform(args[1], args[0])].concat(args.slice(2))
+    : isxspec(args[0])
+      ? args2 => [classidstrTransform(args[0], args2[0])].concat(args2.slice(1))
+      : args)
+  const renderstr = vnode => (
+    render(vnode, document.body), document.body.innerHTML)
+  const x = {key: 'xkey', ui: 'uiblock', uiprefix: 'content'}
+  const span = tags.span(x)
+
+  assert.strictEqual(
+    renderstr(span('ui:', 'hello')),
+    '<span class="content uiblock">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:', 'hello')),
+    '<span class="content uiblock-author-label">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui:#:key', 'hello')),
+    '<span class="content uiblock" id="xkey">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui:#:key---part', 'hello')),
+    '<span class="content uiblock" id="xkey---part">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:#:key', 'hello')),
+    '<span class="content uiblock-author-label" id="xkey">hello</span>')
+
+  assert.strictEqual(
+    renderstr(span('ui-author-label:#:key---part', 'hello')),
+    '<span class="content uiblock-author-label" id="xkey---part">hello</span>')
 })

@@ -1,7 +1,7 @@
 {
   "name": "hypel",
   "type": "module",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "license": "MIT",
   "readmeFilename": "README.md",
   "description": "Terse syntax for hyperscript",
@@ -23,16 +23,18 @@
     "virtual-dom",
     "hyperscript",
     "dynamic id",
-    "dynamic class"
+    "dynamic class",
+    "inferno",
+    "react"
   ],
   "devDependencies": {
-    "inferno-hyperscript": "9.0.3",
-    "inferno-server": "9.0.3",
+    "inferno-hyperscript": "9.0.10",
+    "inferno-server": "9.0.10",
     "html-tag-names": "^2.1.0",
     "hyperscript": "^2.0.2",
-    "snabbdom": "3.6.2",
+    "snabbdom": "3.6.3",
     "eslint": "^9.32.0",
-    "jsdom": "^26.1.0",
+    "jsdom": "^27.4.0",
     "react": "^19.1.1"
   },
   "scripts" : {

@@ -1,16 +1,11 @@
-const isSelectorRe = /^[.#]/
-const nsSepPlainRe = /\//g
-const nsSepEncodeRe = /:/g
-const nsKeyRe = /:[^: -.#]*/g
-const node = h => tagName => (first, ...rest) => {
-  if (isSelectorRe.test(first)) {
-    return h(tagName + first, ...rest)
-  } else if (typeof first === 'undefined') {
-    return h(tagName)
-  } else {
-    return h(tagName, first, ...rest)
-  }
-}
+const isSelector = str => (
+  (str = String(str).charCodeAt(0)), (str === 46 || str === 35))
+
+const node = h => tagName => (first, ...rest) => isSelector(first)
+  ? h(tagName + first, ...rest)
+  : typeof first === 'undefined'
+    ? h(tagName)
+    : h(tagName, first, ...rest)
 
 // The tag names are verified against html-tag-names in the tests
 // See https://github.com/ohanhi/hyperscript-helpers/issues/34 for the reason
@@ -61,14 +56,33 @@ const TAG_NAMESSVG = [
   'view', 'vkern'
 ]
 
-const hypel = h => {
+const toUpperFirst = str => str.charAt(0).toUpperCase() + str.slice(1)
+
+// cryptic-looking recursion here allows a tag hook to return another
+// hook and so on, so that tag calls may accumulate data to resolve
+// final hnode,
+// ```javascript
+// span = tags.span({id: '123'})
+// span(':id', 'hello world')
+// // <span id="123">hello world</span>
+// ```
+const hookedTag = (tag, hook, res) => (...args) => {
+  res = hook(args)
+
+  return typeof res === 'function'
+    ? hookedTag(tag, res)
+    : tag.apply(0, res)
+}
+
+const hypel = (h, hook) => {
   const createTag = node(h)
 
   return TAG_NAMES.reduce((accum, tag) => (
-    accum[tag] = accum[
-      tag.charAt(0).toUpperCase() + tag.slice(1)] = createTag(tag),
+    accum[tag] = accum[toUpperFirst(tag)] = typeof hook === 'function'
+      ? (tag => hookedTag(tag, hook))(createTag(tag))
+      : createTag(tag),
     accum
-  ), { isSelector: n => isSelectorRe.test(n), createTag, TAG_NAMES })
+  ), { isSelector, createTag, TAG_NAMES })
 }
 
 const hypelsvg = h => {
@@ -80,55 +94,8 @@ const hypelsvg = h => {
   ), {})
 }
 
-// var div = h('div.hello/world#hello/world');
-// div.properties.className; // helloa
-// div.properties.id;        // hello
-const encodeid = idstr => idstr.replace(nsSepPlainRe, ':')
-const decodeid = idstr => idstr.replace(nsSepEncodeRe, '/')
-const charCodeHyphen = 45 // the char "-"
-const tryprefix = (opts, classstr, prop, prefixname) => (
-  prop = opts[prop + prefixname],
-  prop && prop !== classstr ? prop + '.' + classstr : classstr)
-const getoptsclassidstr = (opts, classidstr, s) => (
-  s = encodeid(classidstr.replace(nsKeyRe, (m, offset, r) => (
-    m = m.slice(1),
-    r = m in opts ? String(opts[m]) : m,
-    r = classidstr.charCodeAt(offset + m.length + 1) === charCodeHyphen
-      ? r : tryprefix(opts, r, m, 'root'),
-    tryprefix(opts, r, m, 'prefix')
-  ))),
-  s)
-
-const buildoptfns = helperfns => helperfns.TAG_NAMES.reduce((hhh, cur) => (
-  hhh[cur] = (...args) => {
-    const newargs = typeof args[1] === 'string'
-      ? [ getoptsclassidstr(args[0], args[1]), ...args.slice(2) ]
-      : args.slice(1)
-
-    return helperfns[cur](...newargs)
-  },
-  hhh
-), {})
-
-const buildhelper = helpers => h => {
-  const helperobj = helpers(h)
-  const namespace = buildoptfns(helperobj)
-  const hhopts = opts => helperobj.TAG_NAMES.reduce((hhopts, cur) => (
-    hhopts[cur] = (...args) => namespace[cur](opts, ...args),
-    hhopts
-  ), { encodeid, decodeid })
-
-  return helperobj.TAG_NAMES.reduce((hhoptsfn, tagname) => (
-    hhoptsfn[tagname] = namespace[tagname],
-    hhoptsfn
-  ), hhopts)
-}
-
-const hypelns = buildhelper(hypel)
-
 export {
   hypel as default,
   hypel,
-  hypelsvg,
-  hypelns
+  hypelsvg
 }

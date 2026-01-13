@@ -16,7 +16,7 @@ export default htmlstr => {
         .split(/\n/g)
         .map(n => n.replace(/^[ ]*/, ''))
         .join(''))
-  
+
   let indent = -1,
       opentags = [],
       previousIsClosing = false,
@@ -61,7 +61,7 @@ export default htmlstr => {
           return match
         }
       })
-      : (((arr[i - 1].match(/[ ]*/)) || [])[0] || '')
+      : (((arr[Math.max(i - 1, 0)].match(/[ ]*/)) || [])[0] || '')
         + '  ' + line.replace(/^[ ]*/, '')
   )).join('\n').trim()
 }
