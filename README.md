@@ -1,6 +1,13 @@
 hypel
 =====
 
+[![npm][1]][2] [![install size][3]][4]
+
+[1]: https://img.shields.io/npm/v/hypel "hypel npm, badge"
+[2]: https://www.npmjs.com/package/hypel "hypel npm, link"
+[3]: https://packagephobia.now.sh/badge?p=hypel "hypel size, badge"
+[4]: https://packagephobia.now.sh/result?p=hypel "hypel size, link"
+
 `hypel` creates dom elements with vanilla javascript
 ```javascript
 div('#app', [
@@ -58,13 +65,3 @@ This package adds to the original hyperscript-helpers in these ways,
 [0]: https://bumblehead.com                            "bumblehead"
 
 ![scrounge](https://github.com/iambumblehead/scroungejs/raw/main/img/hand.png)
-
-(The MIT License)
-
-Copyright (c) [Bumblehead][0] <chris@bumblehead.com>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
