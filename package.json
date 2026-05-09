@@ -28,13 +28,13 @@
     "react"
   ],
   "devDependencies": {
-    "inferno-hyperscript": "9.0.10",
-    "inferno-server": "9.0.10",
+    "inferno-hyperscript": "9.1.0",
+    "inferno-server": "9.1.0",
     "html-tag-names": "^2.1.0",
     "hyperscript": "^2.0.2",
     "snabbdom": "3.6.3",
     "eslint": "^9.32.0",
-    "jsdom": "^27.4.0",
+    "jsdom": "^29.1.1",
     "react": "^19.1.1"
   },
   "scripts" : {
